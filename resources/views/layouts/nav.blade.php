@@ -21,8 +21,8 @@
                     <a class="p-2 text-muted" href="/">Главная</a>
                     <a class="p-2 text-muted" href="/about">О нас</a>
                     <a class="p-2 text-muted" href="/contacts">Контакты</a>
-                    <a class="p-2 text-muted" href="/post/create">Новая статья</a>
-                    <a class="p-2 text-muted" href="/post/{slug}">***</a>
+                    <a class="p-2 text-muted" href="/posts/create">Новая статья</a>
+                    <a class="p-2 text-muted" href="/posts/{slug}">***</a>
                     <a class="p-2 text-muted" href="/admin/feedbacks">Список обращений</a>
                 </nav>
             </div>
