@@ -20,15 +20,15 @@ Route::get('/posts/create', function () {
     return view('createArticle', [
         'title' => 'Новая статья',
     ]);
-});
+})->middleware('auth');
 Route::get('/posts/{article}', function (App\Models\Article $article){
     return view('show', [
         'article' => $article,
     ]);
 });
-Route::post('/posts/create', 'Article@create');
+Route::post('/posts/create', 'Article@create')->middleware('auth');
 Route::get('/contacts', function () {
     return view('contacts');
 });
 Route::post('/contacts', 'Feedback@new');
-Route::get('/admin/feedbacks', 'Feedback@list');
+Route::get('/admin/feedbacks', 'Feedback@list')->middleware('auth');
