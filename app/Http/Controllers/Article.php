@@ -6,7 +6,10 @@ use App\Models\Article as ArticleModel;
 
 class Article extends Controller
 {
-
+    public function __construct()
+    {
+   
+    }
     public function list()
     {
         return view('welcome', [
