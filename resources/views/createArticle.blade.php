@@ -3,7 +3,7 @@
     Создать новую статью
 </h2>
 @include('layouts.alertErrors')
-<form class="col-8 d-block" action="" method="POST">
+<form class="col-8 d-block" action="/posts" method="POST">
     {{ csrf_field() }}
     <div class="form-group">
         <label for="header">Заголовок статьи</label>
