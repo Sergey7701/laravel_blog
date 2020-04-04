@@ -1,3 +1,4 @@
+
 <?php
 use Illuminate\Support\Facades\Route;
 /*
@@ -10,25 +11,12 @@ use Illuminate\Support\Facades\Route;
   | contains the "web" middleware group. Now create something great!
   |
  */
+
+$router->bind('post', function ($value) {
+    return App\Models\Article::where('slug', $value)->where('publish', 1)->first();
+});
 Auth::routes();
- Route::get('/', 'Article@list');
-Route::get('/home', 'HomeController@index');
-Route::get('/about', function () {
-    return view('about');
-});
-Route::get('/posts/create', function () {
-    return view('createArticle', [
-        'title' => 'Новая статья',
-    ]);
-});
-Route::get('/posts/{article}', function (App\Models\Article $article){
-    return view('show', [
-        'article' => $article,
-    ]);
-});
-Route::post('/posts/create', 'Article@create');
-Route::get('/contacts', function () {
-    return view('contacts');
-});
-Route::post('/contacts', 'Feedback@new');
-Route::get('/admin/feedbacks', 'Feedback@list');
+Route::resource('/posts', 'ArticleController')->middleware('auth');
+Route::get('/', 'ArticleController@index');
+Route::get('/posts/', 'ArticleController@index');
+Route::get('/posts/{post}/', 'ArticleController@show');
