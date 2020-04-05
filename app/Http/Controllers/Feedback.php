@@ -7,7 +7,7 @@ use App\Models\Message;
 class Feedback extends Controller
 {
 
-    public function list()
+    public function index()
     {
         return view('feedback', [
             'messages' => Message::orderByDesc('created_at')->paginate(10),

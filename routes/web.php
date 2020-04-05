@@ -18,5 +18,13 @@ $router->bind('post', function ($value) {
 Auth::routes();
 Route::resource('/posts', 'ArticleController')->middleware('auth');
 Route::get('/', 'ArticleController@index');
+Route::get('/home', 'ArticleController@index');
 Route::get('/posts/', 'ArticleController@index');
 Route::get('/posts/{post}/', 'ArticleController@show');
+Route::get('/about',  function (){
+    return view('about');
+});
+Route::get('/contacts',  function (){
+    return view('contacts');
+});
+Route::get('/admin/feedbacks','Feedback@index')->middleware('auth');

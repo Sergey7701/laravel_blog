@@ -17,6 +17,7 @@ class Article extends Model
         'description',
         'text',
         'publish',
+        'author_id',
     ];
 
     public function sluggable()
@@ -37,5 +38,10 @@ class Article extends Model
     {
         return 'slug';
     }
+
     //
+    public function author()
+    {
+        return $this->belongsTo(\App\User::class);
+    }
 }

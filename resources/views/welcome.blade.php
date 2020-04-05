@@ -14,8 +14,9 @@
          <p class="">
             <small> {{$article->created_at}}</small>
         </p>
+       
         <p class="">
-            <small> {{$article->id}}</small>
+            <small> Автор: {{ $article->author->name}}</small>
         </p>
     </div>
     @endforeach

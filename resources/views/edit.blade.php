@@ -1,4 +1,5 @@
 @include('layouts.header', ['title' => 'Редактировать статью'])
+@if(Auth::check() && Auth::id() === $article->author_id)
 <h2 class="col-12">
     Редактировать статью <span style="color: lightgrey">{{ $article->slug }}</span>
 </h2>
@@ -31,4 +32,5 @@
     @method('DELETE')
      <input type="submit" class="btn btn-danger" value="Delete">
 </form>
+@endif
 @include ('layouts.footer')

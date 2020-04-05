@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateArticleTable extends Migration
 {
+
     /**
      * Run the migrations.
      *
@@ -15,6 +16,8 @@ class CreateArticleTable extends Migration
     {
         Schema::create('articles', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->bigInteger('author_id')->unsigned();
+            $table->foreign('author_id')->references('id')->on('users');
             $table->string('slug')->unique();
             $table->string('header', 100);
             $table->string('description', 255);
@@ -23,6 +26,7 @@ class CreateArticleTable extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
+        Schema::enableForeignKeyConstraints();
     }
 
     /**

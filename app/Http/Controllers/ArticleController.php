@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Article as ArticleModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ArticleController extends Controller
 {
@@ -41,7 +42,8 @@ class ArticleController extends Controller
             'publish'     => 'in:on'
         ]);
         ArticleModel::create(array_merge($data, [
-            'publish' => isset($data['publish']) ? 1 : null,
+            'publish'   => isset($data['publish']) ? 1 : null,
+            'author_id' => Auth::id(),
         ]));
         return redirect('/');
     }
@@ -81,7 +83,7 @@ class ArticleController extends Controller
      */
     public function update(Request $request, ArticleModel $article)
     {
-
+        $this->guard($article->author_id);
         $data = $this->validate($request, [
             'header'      => 'required|between:5,100',
             'description' => 'required|max:255',
@@ -102,7 +104,15 @@ class ArticleController extends Controller
      */
     public function destroy(ArticleModel $article)
     {
+        $this->guard($article->author_id);
         $article->delete();
         return redirect('/');
+    }
+
+    private function guard($author_id)
+    {
+        if ($author_id === Auth::id()) {
+            return abort(403);
+        }
     }
 }
