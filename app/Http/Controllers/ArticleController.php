@@ -11,7 +11,7 @@ class ArticleController extends Controller
     public function index()
     {
         return view('welcome', [
-            'articles' => ArticleModel::wherePublish(!null)->orderByDesc('created_at')->paginate(10),
+            'articles' => ArticleModel::with('tags')->wherePublish(!null)->orderByDesc('created_at')->paginate(10),
         ]);
     }
 
@@ -93,6 +93,8 @@ class ArticleController extends Controller
         $article->update(array_merge($data, [
             'publish' => isset($data['publish']) ? 1 : null,
         ]));
+        $this->tags($request, $article);
+
         return redirect("/posts/$article->slug");
     }
 
@@ -111,8 +113,30 @@ class ArticleController extends Controller
 
     private function guard($author_id)
     {
-        if ($author_id === Auth::id()) {
+        if ($author_id !== Auth::id()) {
             return abort(403);
         }
+    }
+
+    protected function tags(Request $request, ArticleModel $article)
+    {
+        /** @var Collection $existTags */
+        $existTags   = $article->tags->keyBy('name');
+        $requestTags = collect(explode(',', request('tags')))->keyBy(function($item) {
+            return trim($item);
+        });
+        $syncIds      = $existTags->intersectByKeys($requestTags)->pluck('id')->toArray();
+        $tagsToAttach = $requestTags->diffKeys($existTags);
+//        $tagsToDetach = $existTags->diffKeys($requestTags);
+        foreach ($tagsToAttach as $tag) {
+            $tag       = \App\Tag::firstOrCreate(['name' => $tag]);
+//            $article->tags()->attach($tag);
+            $syncIds[] = $tag->id;
+        }
+//        foreach ($tagsToDetach as $tag) {
+//            $article->tags()->detach($tag);
+//        }
+        //dd($syncIds);
+        $article->tags()->sync($syncIds);
     }
 }

@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Route;
   | contains the "web" middleware group. Now create something great!
   |
  */
-
 $router->bind('post', function ($value) {
     return App\Models\Article::where('slug', $value)->where('publish', 1)->first();
 });
@@ -21,6 +20,7 @@ Route::get('/', 'ArticleController@index');
 Route::get('/home', 'ArticleController@index');
 Route::get('/posts/', 'ArticleController@index');
 Route::get('/posts/{post}/', 'ArticleController@show');
+Route::get('/posts/tags/{tag}/', 'TagController@index');
 Route::get('/about',  function (){
     return view('about');
 });

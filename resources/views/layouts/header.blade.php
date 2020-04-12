@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta name="description" content="">
         <meta name="author" content="">
-        <title>{{$title ?? '' }}</title>
+        <title>{{$title ?? config('APP_NAME', '111') }}</title>
         @include ('layouts.styles')
     </head>
 
@@ -13,5 +13,5 @@
 
     @include ('layouts.nav')
         <main role="main" class="container">
-            <div class='row pt-3'>
+            <div class='row pt-3 col-12'>
                  

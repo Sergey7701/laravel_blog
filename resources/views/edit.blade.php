@@ -3,6 +3,7 @@
 <h2 class="col-12">
     Редактировать статью <span style="color: lightgrey">{{ $article->slug }}</span>
 </h2>
+@include('layouts.tags')
 @include('layouts.alertErrors')
 <form class="col-8 d-block" action="/posts/{{ $article->slug }}" method="POST">
     {{ csrf_field() }}
@@ -21,6 +22,10 @@
         <label class="d-block" for="text">Текст статьи</label>
         <textarea class="col-12 form-control" rows="20" name="text" id="text" placeholder="Обязательное поле">{{ trim(old('text', $article->text)) }}</textarea>
     </div>
+    <div class="form-group">
+        <input type="text" class="form-control" name="tags" id="inputTags" value="{{ trim(old('tags',$article->tags->pluck('name')->implode(', '))) }}">
+        <label class="form-check-label" for="publish">Опубликовать</label>
+    </div>
     <div class="form-group form-check">
         <input type="checkbox" class="form-check-input" name="publish" id="publish" {{ old('publish', $article->publish) ? 'checked' : '' }}>
         <label class="form-check-label" for="publish">Опубликовать</label>
@@ -30,7 +35,7 @@
 <form class="col-8 d-block mt-5" action="/posts/{{ $article->slug }}" method="POST">
     {{ csrf_field() }}
     @method('DELETE')
-     <input type="submit" class="btn btn-danger" value="Delete">
+    <input type="submit" class="btn btn-danger" value="Delete">
 </form>
 @endif
 @include ('layouts.footer')

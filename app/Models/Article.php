@@ -39,9 +39,13 @@ class Article extends Model
         return 'slug';
     }
 
-    //
     public function author()
     {
         return $this->belongsTo(\App\User::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(\App\Tag::class);
     }
 }
