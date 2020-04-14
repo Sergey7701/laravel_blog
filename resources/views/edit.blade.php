@@ -23,8 +23,8 @@
         <textarea class="col-12 form-control" rows="20" name="text" id="text" placeholder="Обязательное поле">{{ trim(old('text', $article->text)) }}</textarea>
     </div>
     <div class="form-group">
+        <label class="form-check-label" for="publish">Теги</label>
         <input type="text" class="form-control" name="tags" id="inputTags" value="{{ trim(old('tags',$article->tags->pluck('name')->implode(', '))) }}">
-        <label class="form-check-label" for="publish">Опубликовать</label>
     </div>
     <div class="form-group form-check">
         <input type="checkbox" class="form-check-input" name="publish" id="publish" {{ old('publish', $article->publish) ? 'checked' : '' }}>
