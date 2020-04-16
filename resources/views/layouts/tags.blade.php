@@ -5,9 +5,11 @@
 <p class="col-12">
     @if($tags->isNotEmpty())
         @foreach ($tags as $tag)
-            <span class='{{ $badgeStyle}}'>
-            {{ $tag->name }}
-            </span>
+            @if(!empty(trim($tag)))
+                <span class='{{ $badgeStyle}}'>
+                    {{ $tag->name }}
+                </span>
+            @endif
         @endforeach
     @endif
 </p>

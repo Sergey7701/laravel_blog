@@ -8,10 +8,20 @@ use Illuminate\Support\Facades\Auth;
 class ArticleController extends Controller
 {
 
+    function __construct()
+    {
+        $this->middleware('auth', [
+            'except' => [
+                'index',
+                'show',
+            ]
+        ]);
+    }
+
     public function index()
     {
         return view('welcome', [
-            'articles' => ArticleModel::with('tags')->wherePublish(!null)->orderByDesc('created_at')->paginate(10),
+            'articles' => ArticleModel::with('tags')->wherePublish(!null)->latest()->paginate(10),
         ]);
     }
 
@@ -35,16 +45,18 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $this->validate($request, [
+        $data    = $this->validate($request, [
             'header'      => 'required|between:5,100',
             'description' => 'required|max:255',
             'text'        => 'required',
             'publish'     => 'in:on'
         ]);
-        ArticleModel::create(array_merge($data, [
-            'publish'   => isset($data['publish']) ? 1 : null,
-            'author_id' => Auth::id(),
+        $article = ArticleModel::create(array_merge($data, [
+                'publish'   => isset($data['publish']) ? 1 : null,
+                'author_id' => Auth::id(),
         ]));
+        event(new \App\Events\ArticleCreated($article));
+        flash('Статья успешно создана');
         return redirect('/');
     }
 
@@ -69,6 +81,7 @@ class ArticleController extends Controller
      */
     public function edit(ArticleModel $article)
     {
+        abort_if(\Gate::denies('update', $article), 403);
         return view('edit', [
             'article' => $article,
         ]);
@@ -83,7 +96,7 @@ class ArticleController extends Controller
      */
     public function update(Request $request, ArticleModel $article)
     {
-        $this->guard($article->author_id);
+        abort_if(Auth()->user()->cannot('update', $article), 403);
         $data = $this->validate($request, [
             'header'      => 'required|between:5,100',
             'description' => 'required|max:255',
@@ -94,7 +107,8 @@ class ArticleController extends Controller
             'publish' => isset($data['publish']) ? 1 : null,
         ]));
         $this->tags($request, $article);
-
+        \Mail::to($article->author->email)->send(new \App\Mail\ArticleModified($article));
+        flash('Статья успешно изменена');
         return redirect("/posts/$article->slug");
     }
 
@@ -106,16 +120,11 @@ class ArticleController extends Controller
      */
     public function destroy(ArticleModel $article)
     {
-        $this->guard($article->author_id);
+        abort_if(Auth()->user()->cannot('update', $article), 403);
+        \Mail::to($article->author->email)->send(new \App\Mail\ArticleDeleted($article));
         $article->delete();
+        flash('Статья успешно удалена', 'warning');
         return redirect('/');
-    }
-
-    private function guard($author_id)
-    {
-        if ($author_id !== Auth::id()) {
-            return abort(403);
-        }
     }
 
     protected function tags(Request $request, ArticleModel $article)

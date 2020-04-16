@@ -1,4 +1,5 @@
 @include('layouts.header', ['title' => 'Главная'])
+@include ('layouts.flashMessage')
 @if (count($articles))
 <div class="row col-9">
     @foreach($articles as $article)

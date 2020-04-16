@@ -1,9 +1,10 @@
 @include ('layouts.header', ['title' => $article->header])
+@include ('layouts.flashMessage')
 <div class="row col-12">
     <a class="mb-3 mr-5" href="/">На главную</a>
-    @if(Auth::check() && Auth::id() === $article->author_id)
+    @can('update', $article)
         <a class="mb-3" href="/posts/{{$article->slug}}/edit">Редактировать</a>
-    @endif    
+    @endcan
 </div>
 <div class="row col-9">
     <div class="blog-post">

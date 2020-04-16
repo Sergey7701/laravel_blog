@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta name="description" content="">
         <meta name="author" content="">
-        <title>{{$title ?? config('APP_NAME', '111') }}</title>
+        <title>{{$title ?? ''}}</title>
         @include ('layouts.styles')
     </head>
 
