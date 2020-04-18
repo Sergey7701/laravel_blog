@@ -133,7 +133,7 @@ return [
     | this array to grant expanded functionality to your applications.
     |
     */
-
+    
     'providers' => [
 
         /*
@@ -161,6 +161,9 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+        App\Providers\PermissionServiceProvider::class,
+        App\Providers\RolesServiceProvider::class,
+        App\Providers\PushAllServiceProvider::class,
 
         /*
          * Package Service Providers...
