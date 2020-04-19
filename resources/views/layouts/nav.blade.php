@@ -18,7 +18,7 @@
                                     <form id="logout" method="POST" action="/logout">
                                             {{ csrf_field() }}
                                         <input type="hidden" name="page" value="/logout">
-                                        <input type="submit" class="btn-info" name="ok" value="Logout">
+                                        <input type="submit" class="btn-info p-1" name="ok" value="Logout">
                                     </form>
                                 @else
                                     <a href="{{url('/login')}}" style="margin-right: 10px">Login</a>

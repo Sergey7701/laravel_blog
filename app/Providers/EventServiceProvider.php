@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Providers;
 
 use Illuminate\Auth\Events\Registered;
@@ -8,20 +7,23 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use Illuminate\Support\Facades\Event;
 use App\Events\ArticleCreated;
 use App\Listeners\SendMailArticleCreated;
+use App\Listeners\SendPushNotification;
 
 class EventServiceProvider extends ServiceProvider
 {
+
     /**
      * The event listener mappings for the application.
      *
      * @var array
      */
     protected $listen = [
-        Registered::class => [
+        Registered::class     => [
             SendEmailVerificationNotification::class,
         ],
         ArticleCreated::class => [
             SendMailArticleCreated::class,
+            SendPushNotification::class,
         ]
     ];
 

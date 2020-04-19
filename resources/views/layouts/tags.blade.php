@@ -2,11 +2,11 @@
     $tags = $article->tags ?? collect();
     $badgeStyle = $badgeStyle ?? '';
 @endphp
-<p class="col-12">
+<p class="col-9">
     @if($tags->isNotEmpty())
         @foreach ($tags as $tag)
             @if(!empty(trim($tag)))
-                <span class='{{ $badgeStyle}}'>
+                <span class='{{ $badgeStyle }}'>
                     {{ $tag->name }}
                 </span>
             @endif

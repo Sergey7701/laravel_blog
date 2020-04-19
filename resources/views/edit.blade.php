@@ -1,11 +1,12 @@
 @include('layouts.header', ['title' => 'Редактировать статью'])
 @if(Auth::check() && Auth::id() === $article->author_id)
-<h2 class="col-12">
+<div class="row col-9">
+<h2>
     Редактировать статью <span style="color: lightgrey">{{ $article->slug }}</span>
 </h2>
 @include('layouts.tags')
 @include('layouts.alertErrors')
-<form class="col-8 d-block" action="/posts/{{ $article->slug }}" method="POST">
+<form class="col-12 d-block" action="/posts/{{ $article->slug }}" method="POST">
     {{ csrf_field() }}
     @method('PATCH')
     <div class="form-group">
@@ -38,4 +39,6 @@
     <input type="submit" class="btn btn-danger" value="Delete">
 </form>
 @endif
+</div>
+@include ('layouts.sidebar')
 @include ('layouts.footer')
