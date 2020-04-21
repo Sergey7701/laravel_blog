@@ -21,7 +21,7 @@ class ArticleTest extends TestCase
         //Что
         $this->actingAs(factory(\App\User::class)->create(), 'api');
         //Где и когда
-        $this->post('/posts', $attr = [
+        $this->post(url('/posts'), $attr            = [
             'header'      => $this->faker->sentence(10),
             'description' => $this->faker->text(100),
             'text'        => $this->faker->text(500),
@@ -30,8 +30,47 @@ class ArticleTest extends TestCase
         //В итоге
         $attr['publish'] = 1;
         $this->assertDatabaseHas('articles', $attr);
-//        $response = $this->get('/');
-//
-//        $response->assertStatus(200);
+    }
+
+    public function testAUserCantCreateAnArticleWithoutAllData()
+    {
+        //Что
+        $this->actingAs(factory(\App\User::class)->create(), 'api');
+        //Где и когда
+        $this->post(url('/posts'), $attr            = [
+            'publish' => 'on',
+        ]);
+        //В итоге
+        $attr['publish'] = 1;
+        $this->assertDatabaseMissing('articles', $attr);
+    }
+
+    public function testAUserCantCreateAnArticleWithOnlyHeader()
+    {
+        //Что
+        $this->actingAs(factory(\App\User::class)->create(), 'api');
+        //Где и когда
+        $this->post(url('/posts'), $attr            = [
+            'header'  => $this->faker->sentence(10),
+            'publish' => 'on',
+        ]);
+        //В итоге
+        $attr['publish'] = 1;
+        $this->assertDatabaseMissing('articles', $attr);
+    }
+
+    public function testAUserCantCreateAnArticleWithoutText()
+    {
+        //Что
+        $this->actingAs(factory(\App\User::class)->create(), 'api');
+        //Где и когда
+        $this->post(url('/posts'), $attr            = [
+            'header'      => $this->faker->sentence(10),
+            'description' => $this->faker->text(100),
+            'publish'     => 'on',
+        ]);
+        //В итоге
+        $attr['publish'] = 1;
+        $this->assertDatabaseMissing('articles', $attr);
     }
 }
