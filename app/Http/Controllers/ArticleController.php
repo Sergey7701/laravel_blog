@@ -20,9 +20,8 @@ class ArticleController extends Controller
 
     public function index()
     {
-        //dd(ArticleModel::all());
         return view('welcome', [
-            'articles' => ArticleModel::with('tags')->where('publish', true)->latest()->paginate(10),
+            'articles' => ArticleModel::with('tags')->wherePublish(!null)->latest()->paginate(10),
         ]);
     }
 
@@ -53,7 +52,7 @@ class ArticleController extends Controller
             'publish'     => 'in:on'
         ]);
         $article = ArticleModel::create(array_merge($data, [
-                //'publish'   => isset($data['publish']) ? 1 : null,
+                'publish'   => isset($data['publish']) ? 1 : null,
                 'author_id' => Auth::id(),
         ]));
         event(new \App\Events\ArticleCreated($article));
