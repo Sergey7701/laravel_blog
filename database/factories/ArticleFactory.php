@@ -9,6 +9,6 @@ $factory->define(Article::class, function (Faker $faker) {
         'header'      => $faker->sentence(5),
         'description' => $faker->text(100),
         'text'        => $faker->text(500),
-        'publish'     => $faker->boolean
+        'publish'     => $faker->boolean,
     ];
 });

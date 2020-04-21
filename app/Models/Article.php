@@ -34,7 +34,7 @@ class Article extends Model
 
     public function setPublishAttribute($value)
     {
-        $this->attributes['publish'] = ($value === 'on') ? 1 : 0;
+        $this->attributes['publish'] = ($value) ? 1 : 0;
     }
 
     /**

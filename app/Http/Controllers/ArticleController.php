@@ -20,8 +20,9 @@ class ArticleController extends Controller
 
     public function index()
     {
+        //dd(ArticleModel::all());
         return view('welcome', [
-            'articles' => ArticleModel::with('tags')->wherePublish(!null)->latest()->paginate(10),
+            'articles' => ArticleModel::with('tags')->where('publish', true)->latest()->paginate(10),
         ]);
     }
 
