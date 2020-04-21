@@ -12,15 +12,6 @@ use Illuminate\Support\Facades\Route;
   | contains the "web" middleware group. Now create something great!
   |
  */
-if (strpos(filter_input(INPUT_SERVER, 'REQUEST_URI'), '/admin/') === false) {
-    $router->bind('post', function ($value) {
-        return App\Models\Article::where('slug', $value)->where('publish', 1)->first();
-    });
-} else {
-    $router->bind('post', function ($value) {
-        return App\Models\Article::where('slug', $value)->first();
-    });
-}
 Route::get('/service', 'PushServiceController@form');
 Route::post('/service', 'PushServiceController@send');
 Auth::routes();
@@ -37,5 +28,6 @@ Route::get('/contacts', function () {
 Route::group(['middleware' => 'role:administrator'], function() {
     Route::resource('/admin/posts', 'AdminArticleController');
     Route::get('/admin/feedbacks', 'Feedback@index')->middleware('auth');
+    Route::get('/admin/{post}/versions', 'VersionController@index');
 });
 

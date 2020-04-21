@@ -5,7 +5,7 @@
 <p class="col-9">
     @if($tags->isNotEmpty())
         @foreach ($tags as $tag)
-            @if(!empty(trim($tag)))
+            @if(strlen(trim($tag)) > 1)
                 <span class='{{ $badgeStyle }}'>
                     {{ $tag->name }}
                 </span>

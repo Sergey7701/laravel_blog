@@ -12,16 +12,16 @@ class NewsletterAboutNewArticles extends Notification
 
     use Queueable;
 
-    private $interval;
+    private $articles;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($interval)
+    public function __construct($articles)
     {
-        $this->interval = $interval;
+        $this->articles = $articles;
     }
 
     /**
@@ -41,11 +41,8 @@ class NewsletterAboutNewArticles extends Notification
      * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    public function toMail($notifiable)
+    public function toMail($notifiable, $articles)
     {
-        $articles = \App\Models\Article::where('created_at', '>', (new Carbon)->subDays($this->interval))->get();
-        $mail     = '';
-
         $mailText = (new MailMessage)
             ->subject('Новые статьи на сайте ' . env('APP_NAME'))
             ->line('За последнее время на нашем сайте появились следующие статьи:');
