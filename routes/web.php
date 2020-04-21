@@ -37,5 +37,6 @@ Route::get('/contacts', function () {
 Route::group(['middleware' => 'role:administrator'], function() {
     Route::resource('/admin/posts', 'AdminArticleController');
     Route::get('/admin/feedbacks', 'Feedback@index')->middleware('auth');
+    Route::get('/admin/{post}/versions', 'VersionController@index');
 });
 

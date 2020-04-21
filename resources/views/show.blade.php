@@ -8,15 +8,16 @@
             <a class="mb-3 mr-5" href="/">На главную</a>
         @endif
     @endcan
-    @can('update', $article)
-        <a class="mb-3" href="/posts/{{$article->slug}}/edit">Редактировать</a>
-    @endcan
     @role('administrator')
         @if (Auth::user()->can('manage-articles'))
-            <a class="mb-3 text-info" href="/admin/posts/{{$article->slug}}/edit">Управлять статьёй</a>
+            <a class="ml-3 mb-3 text-info" href="/admin/posts/{{$article->slug}}/edit">Управлять статьёй</a>
         @endif
-    @endcan
-    
+    @else
+        @can('update', $article)
+        <a class="mb-3" href="/posts/{{$article->slug}}/edit">Редактировать</a>
+        @endcan
+    @endcan    
+
 </div>
 <div class="row col-9">
     <div class="blog-post">

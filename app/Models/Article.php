@@ -19,6 +19,9 @@ class Article extends Model
         'publish',
         'author_id',
     ];
+    protected $casts = [
+        'publish' => 'boolean',
+    ];
 
     public function sluggable()
     {
@@ -27,6 +30,11 @@ class Article extends Model
                 'source' => 'header'
             ]
         ];
+    }
+
+    public function setPublishAttribute($value)
+    {
+        $this->attributes['publish'] = ($value === 'on') ? 1 : 0;
     }
 
     /**

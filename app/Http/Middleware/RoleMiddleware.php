@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Middleware;
+use Illuminate\Support\Facades\Auth;
 
 use Closure;
 
@@ -15,8 +16,8 @@ class RoleMiddleware
      */
     public function handle($request, Closure $next, $role, $permission = null)
     {
-        if (!auth()->user()->hasRole($role)) {
-               //exit('Тут сработало!');
+        if (!Auth::check() || !auth()->user()->hasRole($role))  {
+            //exit('Тут сработало!');
             abort(404);
         }
         if ($permission !== null && !auth()->user()->can($permission)) {

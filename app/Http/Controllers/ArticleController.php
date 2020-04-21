@@ -52,7 +52,7 @@ class ArticleController extends Controller
             'publish'     => 'in:on'
         ]);
         $article = ArticleModel::create(array_merge($data, [
-                'publish'   => isset($data['publish']) ? 1 : null,
+                //'publish'   => isset($data['publish']) ? 1 : null,
                 'author_id' => Auth::id(),
         ]));
         event(new \App\Events\ArticleCreated($article));

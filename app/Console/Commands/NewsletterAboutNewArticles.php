@@ -38,8 +38,9 @@ class NewsletterAboutNewArticles extends Command
      */
     public function handle()
     {
+        $articles  = \App\Models\Article::where('created_at', '>', (new Carbon)->subDays($this->argument('interval')))->get();
         \App\User::all()->map(function($user) {
-            $user->notify(new Newsletter($this->argument('interval')));
+            $user->notify(new NewsLetter($articles));
         });
     }
 }
