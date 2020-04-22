@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUsersRolesTable extends Migration
+class CreateRoleUserTable extends Migration
 {
 
     /**
@@ -14,7 +14,7 @@ class CreateUsersRolesTable extends Migration
      */
     public function up()
     {
-        Schema::create('users_roles', function (Blueprint $table) {
+        Schema::create('role_user', function (Blueprint $table) {
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('role_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

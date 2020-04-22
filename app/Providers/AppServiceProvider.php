@@ -28,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with('tagsCloud', \App\Tag::tagsCloud());
         });
         Blade::if('role', function ($role) {
-            return \auth()->check() && !\auth()->user()->hasRole('$role');
+            return \auth()->check() && \auth()->user()->hasRole($role);
         });
     }
 }
