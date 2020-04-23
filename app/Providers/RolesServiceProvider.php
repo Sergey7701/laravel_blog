@@ -2,7 +2,6 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Blade;
 
 class RolesServiceProvider extends ServiceProvider
 {
@@ -24,8 +23,6 @@ class RolesServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Blade::if('role', function ($role) {
-            return "<?php if(auth()->check() && auth()->user()->hasRole({$role})) : ?>";
-        });
+        
     }
 }
