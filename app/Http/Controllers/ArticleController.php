@@ -122,7 +122,11 @@ class ArticleController extends Controller
     {
         /** @var Collection $existTags */
         $existTags   = $article->tags->keyBy('name');
-        $requestTags = collect(explode(',', request('tags')))->keyBy(function($item) {
+        $requestTags = collect(explode(',', request('tags')))
+            ->transform(function ($item){
+                return trim($item);
+            })
+            ->keyBy(function($item) {
             return trim($item);
         });
         $syncIds      = $existTags->intersectByKeys($requestTags)->pluck('id')->toArray();
@@ -136,12 +140,13 @@ class ArticleController extends Controller
             }
             $article->tags()->sync($syncIds);
         }
+        $this->createVersion($article);
     }
 
     protected function updateFunction(Request $request, ArticleModel $article)
     {
         $oldArticle = clone $article;
-        $data = $this->validate($request, [
+        $data       = $this->validate($request, [
             'header'      => 'required|between:5,100',
             'description' => 'required|max:255',
             'text'        => 'required',

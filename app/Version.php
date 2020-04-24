@@ -58,7 +58,7 @@ class Version extends Model
 
     public function setTagsAttribute($newValue)
     {
-        $this->attributes['tags'] = $newValue;
-        $this->attributes['old_tags']     = $this->recentArticle()->tags->implode('name', ', ');
+        $this->attributes['old_tags'] = $newValue;
+        $this->attributes['tags']     = $this->recentArticle()->tags->implode('name', ', ');
     }
 }
