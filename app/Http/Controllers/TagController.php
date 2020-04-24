@@ -8,8 +8,12 @@ class TagController extends Controller
 
     public function index(\App\Tag $tag)
     {
+        $articles = $tag->articles()->with('tags');
+        if (!\auth()->check() || !\auth()->user()->can('manage-articles')) {
+            $articles = $articles->wherePublish(1);
+        }
         return view('welcome', [
-            'articles' => $tag->articles()->with('tags')->wherePublish(1)->orderByDesc('created_at')->paginate(10),
+            'articles' => $articles->orderByDesc('created_at')->paginate(10),
         ]);
     }
 }

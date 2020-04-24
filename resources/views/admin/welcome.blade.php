@@ -9,9 +9,7 @@
             <a href="/admin/posts/{{$article->slug}}">
                 {{$article->header}}
             </a>
-            @if(!$article->publish)
-            <span style="color: red;"><small>Черновик</small></span>
-            @endif
+            @include('layouts.publishStatus')
         </h2>
         
         @include('layouts.tags', ['badgeStyle' => 'badge badge-info'])

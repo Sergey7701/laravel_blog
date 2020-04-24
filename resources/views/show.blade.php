@@ -16,6 +16,7 @@
     <div class="blog-post">
         <h2 class="blog-post-title">
             {{$article->header}}
+            @include('layouts.publishStatus')
         </h2>
         @include('layouts.tags', ['badgeStyle' => 'badge badge-info'])
         <p>

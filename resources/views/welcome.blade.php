@@ -7,6 +7,7 @@
         <h2 class="blog-post-title">
             <a href="/posts/{{$article->slug}}">
                 {{$article->header}}
+                @include('layouts.publishStatus')
             </a>
         </h2>
         @include('layouts.tags', ['badgeStyle' => 'badge badge-info'])
