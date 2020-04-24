@@ -27,8 +27,8 @@ class AppServiceProvider extends ServiceProvider
         view()->composer('layouts.sidebar', function(\Illuminate\View\View $view) {
             $view->with('tagsCloud', \App\Tag::tagsCloud());
         });
-        Blade::if('role', function ($role) {
-            return \auth()->check() && \auth()->user()->hasRole($role);
+        Blade::if('permission', function ($permissionSlug) {
+            return \auth()->check() && \auth()->user()->hasPermission($permissionSlug);
         });
     }
 }

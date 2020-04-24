@@ -12,14 +12,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $this->call(RoleSeeder::class);
+        $this->call(PermissionSeeder::class);
         factory(App\Tag::class, 20)->create();
         factory(\App\User::class)->create([
             'name'     => 'user1',
             'email'    => 'user1@example.com',
             'password' => Hash::make('12345678'),
         ]);
-        $this->call(RoleSeeder::class);
-        $this->call(PermissionSeeder::class);     
+
         App\Permission::where('slug', 'manage-users')->first()->roles()
             ->sync([
                 App\Role::where('slug', 'administrator')->first()->id,

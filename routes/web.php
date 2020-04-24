@@ -25,9 +25,12 @@ Route::get('/about', function () {
 Route::get('/contacts', function () {
     return view('contacts');
 });
-Route::group(['middleware' => 'role:administrator'], function() {
+Route::group(['middleware' => 'role:administrator', 'middleware' => 'role:editor'], function() {
     Route::resource('/admin/posts', 'AdminArticleController');
+});
+Route::group(['middleware' => 'role:administrator'], function() {
     Route::get('/admin/feedbacks', 'Feedback@index')->middleware('auth');
     Route::get('/admin/{post}/versions', 'VersionController@index');
 });
+
 

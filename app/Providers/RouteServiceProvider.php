@@ -35,7 +35,7 @@ class RouteServiceProvider extends ServiceProvider
 
         parent::boot();
         Route::bind('post', function($slug) {
-            if (\auth()->check() && !\auth()->user()->hasRole('administrator')) {
+            if (\auth()->check() && !\auth()->user()->hasRole('administrator', 'editor')) {
                 return ArticleModel::where('slug', $slug)->where('publish', 1)->first();
             } else {
                 return ArticleModel::where('slug', $slug)->first();
