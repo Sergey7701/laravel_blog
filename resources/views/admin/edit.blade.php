@@ -3,6 +3,7 @@
 <div class="row col-9">
 @permission('manage-articles')
     <a class="mb-3 ml-5 text-info" href="/admin/posts">На главную для администраторов</a>
+    <a class="mb-3 ml-5 text-info" href="/admin/{{ $article->slug }}/versions">История изменений статьи</a>
         <h2 class="col-12">
             Редактировать статью <span style="color: lightgrey">{{ $article->slug }}</span>
         </h2>

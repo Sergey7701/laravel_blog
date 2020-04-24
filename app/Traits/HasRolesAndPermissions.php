@@ -29,7 +29,7 @@ trait HasRolesAndPermissions
      */
     public function hasRole(... $roles)
     {
-        foreach ($roles as $role) {
+        foreach ($roles as $role) {            
             if ($this->role->slug === $role) {
                 return true;
             }

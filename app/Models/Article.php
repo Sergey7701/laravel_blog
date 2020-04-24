@@ -4,6 +4,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Version;
 
 class Article extends Model
 {
@@ -19,7 +20,7 @@ class Article extends Model
         'publish',
         'author_id',
     ];
-    protected $casts = [
+    protected $casts    = [
         'publish' => 'boolean',
     ];
 
@@ -55,5 +56,10 @@ class Article extends Model
     public function tags()
     {
         return $this->belongsToMany(\App\Tag::class);
+    }
+
+    public function versions()
+    {
+        return $this->hasMany(Version::class);
     }
 }

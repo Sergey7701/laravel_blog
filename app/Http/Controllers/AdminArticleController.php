@@ -80,7 +80,6 @@ class AdminArticleController extends ArticleController
     public function edit(ArticleModel $article)
     {
         //abort_if(\Gate::denies('update', $article), 403);
-
         return view('admin.edit', [
             'article' => $article,
         ]);
@@ -95,18 +94,7 @@ class AdminArticleController extends ArticleController
      */
     public function update(Request $request, ArticleModel $article)
     {
-        $data = $this->validate($request, [
-            'header'      => 'required|between:5,100',
-            'description' => 'required|max:255',
-            'text'        => 'required',
-            'publish'     => 'in:on'
-        ]);
-        $article->update(array_merge($data, [
-            'publish' => isset($data['publish']) ? 1 : null,
-        ]));
-        $this->tags($request, $article);
-        \Mail::to($article->author->email)->send(new \App\Mail\ArticleModified($article));
-        flash('Статья успешно изменена');
+        $article = $this->updateFunction($request, $article);
         return redirect("/posts/$article->slug");
     }
 

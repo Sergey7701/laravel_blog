@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Models\Article as ArticleModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Version;
+use App\Tag;
 
 class ArticleController extends Controller
 {
@@ -20,7 +22,6 @@ class ArticleController extends Controller
 
     public function index()
     {
-        //dd(ArticleModel::all());
         return view('welcome', [
             'articles' => ArticleModel::with('tags')->where('publish', true)->latest()->paginate(10),
         ]);
@@ -98,18 +99,7 @@ class ArticleController extends Controller
     public function update(Request $request, ArticleModel $article)
     {
         abort_if(Auth()->user()->cannot('update', $article), 403);
-        $data = $this->validate($request, [
-            'header'      => 'required|between:5,100',
-            'description' => 'required|max:255',
-            'text'        => 'required',
-            'publish'     => 'in:on'
-        ]);
-        $article->update(array_merge($data, [
-            'publish' => isset($data['publish']) ? 1 : null,
-        ]));
-        $this->tags($request, $article);
-        \Mail::to($article->author->email)->send(new \App\Mail\ArticleModified($article));
-        flash('Статья успешно изменена');
+        $article = $this->updateFunction($request, $article);
         return redirect("/posts/$article->slug");
     }
 
@@ -137,16 +127,44 @@ class ArticleController extends Controller
         });
         $syncIds      = $existTags->intersectByKeys($requestTags)->pluck('id')->toArray();
         $tagsToAttach = $requestTags->diffKeys($existTags);
-//        $tagsToDetach = $existTags->diffKeys($requestTags);
-        foreach ($tagsToAttach as $tag) {
-            $tag       = \App\Tag::firstOrCreate(['name' => $tag]);
-//            $article->tags()->attach($tag);
-            $syncIds[] = $tag->id;
+        if (count($tagsToAttach)) {
+            foreach ($tagsToAttach as $tag) {
+                if (strlen($tag)) {
+                    $tag       = Tag::firstOrCreate(['name' => $tag]);
+                    $syncIds[] = $tag->id;
+                }
+            }
+            $article->tags()->sync($syncIds);
         }
-//        foreach ($tagsToDetach as $tag) {
-//            $article->tags()->detach($tag);
-//        }
-        //dd($syncIds);
-        $article->tags()->sync($syncIds);
+    }
+
+    protected function updateFunction(Request $request, ArticleModel $article)
+    {
+        $oldArticle = clone $article;
+        $data = $this->validate($request, [
+            'header'      => 'required|between:5,100',
+            'description' => 'required|max:255',
+            'text'        => 'required',
+            'publish'     => 'in:on'
+        ]);
+        $article->update($data);
+        $this->tags($request, $article);
+        $this->createVersion($oldArticle);
+        \Mail::to($article->author->email)->send(new \App\Mail\ArticleModified($article));
+        flash('Статья успешно изменена');
+        return $article;
+    }
+
+    protected function createVersion(ArticleModel $article)
+    {
+        Version::create([
+            'article_id'  => $article->id,
+            'editor_id'   => (int) Auth::id(),
+            'header'      => $article->header,
+            'description' => $article->description,
+            'text'        => $article->text,
+            'publish'     => $article->publish,
+            'tags'        => $article->tags->implode('name', ', '),
+        ]);
     }
 }
