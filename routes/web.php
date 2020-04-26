@@ -20,19 +20,24 @@ Route::get('/', 'ArticleController@index');
 Route::get('/home', 'HomeController@index');
 Route::get('/posts/tags/{tag}/', 'TagController@index');
 Route::get('/about', function () {
+    session(['admin' => false]);
     return view('about');
 });
 Route::get('/contacts', function () {
+    session(['admin' => false]);
     return view('contacts');
 });
-Route::group(['middleware' => 'role:editor'], function() {
-    Route::resource('/admin/posts', 'AdminArticleController');
-    Route::get('/admin/{post}/versions', 'VersionController@index');
-});
-Route::group(['middleware' => 'role:administrator'], function() {
+Route::resource('/news', 'NewsController');
+//Admin Section
+Route::group(['middleware' => 'permission:manage-articles'], function() {
     Route::get('/admin/feedbacks', 'Feedback@index')->middleware('auth');
     Route::resource('/admin/posts', 'AdminArticleController');
     Route::get('/admin/{post}/versions', 'VersionController@index');
+    Route::get('/admin', function (){
+        session(['admin' => true]);
+        return redirect('/admin/posts');
+    });
+    Route::resource('/admin/news', 'AdminNewsController');
 });
 
 

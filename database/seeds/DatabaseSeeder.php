@@ -33,7 +33,8 @@ class DatabaseSeeder extends Seeder
         $this->call(UserSeeder::class);
         factory(App\User::class, 2)->create()->each(function($user) {
             $user->articles()->saveMany(factory(App\Models\Article::class, (int) rand(10, 20))->make());
+            $user->news()->saveMany(factory(App\News::class, (int) rand(10, 20))->make());
         });
-        $this->call(ArticleTagTableSeeder::class);
+        $this->call(EntryTagTableSeeder::class);
     }
 }

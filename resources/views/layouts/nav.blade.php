@@ -33,17 +33,32 @@
                     </div>
                 </div>
             </header>
-
-            <div class="nav-scroller py-1 mb-2">
-                <nav class="nav d-flex justify-content-between">
-                    <a class="p-2 text-muted" href="/posts">Главная</a>
-                    <a class="p-2 text-muted" href="/about">О нас</a>
-                    <a class="p-2 text-muted" href="/contacts">Контакты</a>
-                    <a class="p-2 text-muted" href="/posts/create">Новая статья</a>
-                    <a class="p-2 text-muted" href="/posts/{slug}">***</a>
-                    <a class="p-2 text-muted" href="/admin/feedbacks">Список обращений</a>
-                </nav>
-            </div>
+            @php
+                if(session('admin') === true) {
+            @endphp    
+                    <div class="nav-scroller py-1 mb-2">
+                        <nav class="nav d-flex justify-content-between">
+                            <a class="p-2 text-muted" href="/admin/posts">Главная для администраторов</a>
+                            <a class="p-2 text-muted" href="/admin/news/create">Новая новость</a>
+                            <a class="p-2 text-muted" href="/posts">Пользовательский раздел</a>
+                            <a class="p-2 text-muted" href="/admin/feedbacks">Список обращений</a>
+                        </nav>
+                    </div>
+            @php    
+                } else {
+            @endphp    
+                    <div class="nav-scroller py-1 mb-2">
+                        <nav class="nav d-flex justify-content-between">
+                            <a class="p-2 text-muted" href="/posts">Главная</a>
+                            <a class="p-2 text-muted" href="/about">О нас</a>
+                            <a class="p-2 text-muted" href="/contacts">Контакты</a>
+                            <a class="p-2 text-muted" href="/posts/create">Новая статья</a>
+                            <a class="p-2 text-muted" href="/admin/">Административный раздел</a>
+                        </nav>
+                    </div>
+            @php
+                }
+            @endphp
 <!--
             <div class="jumbotron p-3 p-md-5 text-white rounded bg-dark">
                 <div class="col-md-6 px-0">

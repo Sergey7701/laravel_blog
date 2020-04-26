@@ -1,29 +1,23 @@
-@include('layouts.header', ['title' => 'Главная'])
+<?php
+    use App\Models\Article;
+    use App\News;
+?>
+@include ('layouts.header', ['title' => 'Главная'])
 @include ('layouts.flashMessage')
-@if (count($articles))
+@if (count($entries))
 <div class="row col-9">
-    @foreach($articles as $article)
-    <div class="blog-post col-9">
-        <h2 class="blog-post-title">
-            <a href="/posts/{{$article->slug}}">
-                {{$article->header}}
-                @include('layouts.publishStatus')
-            </a>
-        </h2>
-        @include('layouts.tags', ['badgeStyle' => 'badge badge-info'])
-        <p>
-            {{$article->description}}
-        </p>
-        <p class="">
-            <small> {{$article->created_at}}</small>
-        </p>
-        <p class="">
-            <small> Автор: {{ $article->author->name}}</small>
-        </p>
-    </div>
+    @foreach($entries as $entry)
+        @switch ($entry->entryable_type)
+            @case (Article::class)
+                @include('layouts.printWelcomeArticlePreview', ['article' => $entry->entryable])
+                @break
+            @case (News::class)
+                @include('layouts.printWelcomeNewsPreview', ['news' => $entry->entryable])
+                @break
+        @endswitch
     @endforeach
 </div>
-@include('layouts.sidebar')    
+@include ('layouts.sidebar')
 @endif
-{{ $articles->links() }}
+{{ $entries->links() }}
 @include ('layouts.footer')

@@ -20,7 +20,11 @@ trait HasRolesAndPermissions
      */
     public function permissions()
     {
+        if ($this->role){
         return $this->role->permissions();
+        } else {
+            return null;
+        }
     }
 
     /**

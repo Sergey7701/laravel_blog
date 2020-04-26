@@ -10,6 +10,7 @@ class Version extends Model
         'article_id',
         'editor_id',
         'tags',
+        'old_tags',
         'header',
         'description',
         'text',
@@ -28,37 +29,32 @@ class Version extends Model
 
     public function scopeRecentArticle()
     {
-        return $this->article()->latest()->first();
+        return $this->article()->where('id', $this->article_id)->first();
     }
 
     public function setHeaderAttribute($newValue)
     {
-        
-        $this->attributes['old_header']     = $newValue;
-        $this->attributes['header'] = $this->recentArticle()->header;
+        $this->attributes['header']     = $newValue;
+        $this->attributes['old_header'] = $this->recentArticle()->header;
     }
 
     public function setDescriptionAttribute($newValue)
     {
-        $this->attributes['old_description']     = $newValue;
-        $this->attributes['description'] = $this->recentArticle()->description;
+        $this->attributes['description']     = $newValue;
+        $this->attributes['old_description'] = $this->recentArticle()->description;
     }
 
     public function setTextAttribute($newValue)
     {
-        $this->attributes['old_text']     = $newValue;
-        $this->attributes['text'] = $this->recentArticle()->text;
+        $this->attributes['text']     = $newValue;
+        $this->attributes['old_text'] = $this->recentArticle()->text;
     }
 
     public function setPublishAttribute($newValue)
     {
-        $this->attributes['old_publish']     = $newValue ? 1 : 0;
-        $this->attributes['publish'] = $this->recentArticle()->publish;
+        $this->attributes['publish']     = $newValue ? 1 : 0;
+        $this->attributes['old_publish'] = $this->recentArticle()->publish;
     }
 
-    public function setTagsAttribute($newValue)
-    {
-        $this->attributes['old_tags'] = $newValue;
-        $this->attributes['tags']     = $this->recentArticle()->tags->implode('name', ', ');
-    }
+   
 }

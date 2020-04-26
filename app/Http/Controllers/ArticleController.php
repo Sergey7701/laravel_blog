@@ -22,8 +22,10 @@ class ArticleController extends Controller
 
     public function index()
     {
+        session(['admin' => false]);
         return view('welcome', [
-            'articles' => ArticleModel::with('tags')->where('publish', true)->latest()->paginate(10),
+            'entries' => \App\Entry::latest()->where('publish', true)->paginate(10),
+            //'articles' => ArticleModel::with('tags')->where('publish', true)->latest()->paginate(10),
         ]);
     }
 
@@ -122,11 +124,7 @@ class ArticleController extends Controller
     {
         /** @var Collection $existTags */
         $existTags   = $article->tags->keyBy('name');
-        $requestTags = collect(explode(',', request('tags')))
-            ->transform(function ($item){
-                return trim($item);
-            })
-            ->keyBy(function($item) {
+        $requestTags = collect(explode(',', request('tags')))->keyBy(function($item) {
             return trim($item);
         });
         $syncIds      = $existTags->intersectByKeys($requestTags)->pluck('id')->toArray();
@@ -138,38 +136,28 @@ class ArticleController extends Controller
                     $syncIds[] = $tag->id;
                 }
             }
-            $article->tags()->sync($syncIds);
         }
-        $this->createVersion($article);
+        $article->tags()->sync($syncIds);
+        return $article;
     }
 
     protected function updateFunction(Request $request, ArticleModel $article)
     {
-        $oldArticle = clone $article;
-        $data       = $this->validate($request, [
+        $oldArticle      = clone $article;
+        $oldTags         = $oldArticle->tags->implode('name', ',');
+        $data            = $this->validate($request, [
             'header'      => 'required|between:5,100',
             'description' => 'required|max:255',
             'text'        => 'required',
             'publish'     => 'in:on'
         ]);
-        $article->update($data);
+        $data['publish'] = isset($data['publish']) ? $data['publish'] : null;
         $this->tags($request, $article);
-        $this->createVersion($oldArticle);
+        $article->newTags = $request->tags;
+        $article->oldTags = $oldTags;
+        $article->update($data);
         \Mail::to($article->author->email)->send(new \App\Mail\ArticleModified($article));
         flash('Статья успешно изменена');
         return $article;
-    }
-
-    protected function createVersion(ArticleModel $article)
-    {
-        Version::create([
-            'article_id'  => $article->id,
-            'editor_id'   => (int) Auth::id(),
-            'header'      => $article->header,
-            'description' => $article->description,
-            'text'        => $article->text,
-            'publish'     => $article->publish,
-            'tags'        => $article->tags->implode('name', ', '),
-        ]);
     }
 }

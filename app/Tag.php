@@ -1,6 +1,7 @@
 <?php
 namespace App;
 
+use App\Models\Article;
 use Illuminate\Database\Eloquent\Model;
 
 class Tag extends Model
@@ -17,7 +18,12 @@ class Tag extends Model
 
     public function articles()
     {
-        return $this->belongsToMany(\App\Models\Article::class);
+        return $this->morphedByMany(Article::class, 'taggable');
+    }
+
+    public function news()
+    {
+        return $this->morphedByMany(News::class, 'taggable');
     }
 
     public static function tagsCloud()
