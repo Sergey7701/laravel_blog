@@ -28,6 +28,16 @@ class Tag extends Model
 
     public static function tagsCloud()
     {
-        return (new static)->has('articles')->get();
+        return ((new static)->whereHas('articles', function ($query) {
+                    if (!\auth()->check() || !\auth()->user()->can('manage-articles')) {
+                        $query->wherePublish(1);
+                    }
+                })->get())
+                ->merge(
+                    ((new static)->whereHas('news', function ($query) {
+                        if (!\auth()->check() || !\auth()->user()->can('manage-articles')) {
+                            $query->wherePublish(1);
+                        }
+                    })->get()));
     }
 }

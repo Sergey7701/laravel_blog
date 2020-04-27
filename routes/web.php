@@ -32,7 +32,8 @@ Route::resource('/news', 'NewsController');
 Route::group(['middleware' => 'permission:manage-articles'], function() {
     Route::get('/admin/feedbacks', 'Feedback@index')->middleware('auth');
     Route::resource('/admin/posts', 'AdminArticleController');
-    Route::get('/admin/{post}/versions', 'VersionController@index');
+    Route::get('/admin/posts/{post}/versions', 'VersionController@index');
+    Route::get('/admin/news/{post}/versions', 'VersionController@index');
     Route::get('/admin', function (){
         session(['admin' => true]);
         return redirect('/admin/posts');

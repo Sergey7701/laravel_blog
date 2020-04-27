@@ -7,9 +7,7 @@
             <a class="mb-3 mr-5" href="/">На главную</a>
     @endpermission
     @permission('manage-articles')
-        <a class="ml-3 mb-3 text-info" href="/admin/news/{{$news->slug}}/edit">Управлять новостью</a>
-    @else
-        <a class="mb-3" href="/news/{{$news->slug}}/edit">Редактировать</a>
+        <a class="ml-3 mb-3 text-info" href="/admin/news/{{$news->slug}}/edit">Управлять новостью</a>   
     @endpermission
 </div>
 <div class="row col-9">
@@ -19,7 +17,10 @@
             @include('layouts.publishStatus', ['entry' => $news])
         </h2>
         @include ('layouts.newsBadge')
-        @include('layouts.tags', ['badgeStyle' => 'badge badge-info'])
+        @include('layouts.tags', [
+         'entry' => $news,
+         'badgeStyle' => 'badge badge-info',
+        ])
         <p>
             {{$news->text}}
         </p>

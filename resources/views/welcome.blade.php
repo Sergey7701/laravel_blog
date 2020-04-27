@@ -4,6 +4,7 @@
 ?>
 @include ('layouts.header', ['title' => 'Главная'])
 @include ('layouts.flashMessage')
+
 @if (count($entries))
 <div class="row col-9">
     @foreach($entries as $entry)

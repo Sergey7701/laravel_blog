@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\News;
 use Illuminate\Support\Facades\Auth;
+use App\Version;
 
 class NewsController extends Controller
 {
@@ -94,45 +95,26 @@ class NewsController extends Controller
             }
         }
         $news->tags()->sync($syncIds);
-        Version::create([
-            'article_id' => $article->id,
-            'editor_id'  => (int) Auth::id(),
-            'header'     => $article->header,
-//            'description' => $article->description,
-            'text'       => $article->text,
-            'publish'    => $article->publish,
-            'tags'       => $article->tags->implode('name', ', '),
-        ]);
+        return $news;
     }
 
     protected function updateFunction(Request $request, News $news)
     {
-        $oldArticle      = clone $news;
-        $oldTags         = $oldArticle->tags->implode('name', ', ');
-        $data            = $this->validate($request, [
+        $oldArticle       = clone $news;
+        $oldTags          = $oldArticle->tags->implode('name', ', ');
+        $data             = $this->validate($request, [
             'header'  => 'required|between:5,100',
             'text'    => 'required',
             'publish' => 'in:on'
         ]);
-        $data['publish'] = isset($data['publish']) ? $data['publish'] : null;
+        $data['publish']  = isset($data['publish']) ? $data['publish'] : null;
         $news->update($data);
+        $news->newTags = $request->tags;
+        $news->oldTags = $oldTags;
         $this->tags($request, $news);
         // $this->createVersion($oldArticle, $oldTags);
         \Mail::to($news->author->email)->send(new \App\Mail\ArticleModified($news));
         flash('Новость успешно изменена');
         return $news;
-    }
-
-    protected function createVersion(News $news, $oldTags)
-    {
-        Version::create([
-            'article_id'  => $news->id,
-            'editor_id'   => (int) Auth::id(),
-            'header'      => $news->header,
-            'description' => $news->description,
-            'text'        => $news->text,
-            'publish'     => $news->publish,
-            'tags'        => $oldTags,
-        ]);
     }
 }

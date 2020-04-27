@@ -1,6 +1,8 @@
 @include('layouts.header', ['title' => 'Редактировать новость'])
 <div class="row col-9">
     @permission('manage-articles')
+        <a class="mb-3 ml-5 text-info" href="/admin/posts">На главную для администраторов</a>
+        <a class="mb-3 ml-5 text-info" href="/admin/news/{{ $news->slug }}/versions">История изменений статьи</a>
         <h2>
             Редактировать новость<span style="color: lightgrey">{{ $news->slug }}</span>
         </h2>
