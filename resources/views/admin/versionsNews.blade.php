@@ -2,14 +2,14 @@
 @include ('layouts.adminHeader')
 @include ('layouts.flashMessage')
 <h2>
-    История изменения статьи 
+    История изменения новости 
     @if (!empty($versions[0]))
         <span style="color: lightgrey"> {{ $versions[0]->news->slug }}</span>
     @endif    
 </h2>
 @if (!empty($versions[0]))   
     <h4 class="col-12">
-        <a href="/news/{{$versions[0]->news->slug}}"> К статье </a>
+        <a href="/news/{{$versions[0]->news->slug}}"> К новости </a>
     </h4>
 @endif    
 @if (count($versions))
@@ -44,19 +44,6 @@
             </p>
         @else
             <p class="blog-post-text text-secondary">Теги не менялись</p>
-        @endif
-        @if ($version->description !== $version->old_description)   
-            <p class="blog-post-text text-info">Описание:</p>
-            <p class="blog-post-text text-primary">
-                <span class="bg-info text-white mr-1"> Стало: </span> 
-                {{$version->description}}
-            </p>
-            <p class="blog-post-text text-secondary">
-                <span class="bg-secondary text-white mr-1"> Было:&nbsp; </span> 
-                {{$version->old_description}}
-            </p>
-        @else
-            <p class="blog-post-text text-secondary">Описание не менялось</p>
         @endif
         @if ($version->text !== $version->old_text)   
             <p class="blog-post-text text-info">Текст:</p>
