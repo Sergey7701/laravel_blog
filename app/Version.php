@@ -16,6 +16,20 @@ class Version extends Model
         'text',
         'publish',
     ];
+    protected static function boot(){
+        parent::boot();
+        static::creating(function ($version){
+            if ($version->type === Models\Article::class){
+                unset ($version->type);
+            }
+            if ($version->type === News::class){
+                dd($version->toArray());
+                VersionNews::create($version->toArray());
+            }
+        });
+            
+        
+    }
 
     public function article()
     {

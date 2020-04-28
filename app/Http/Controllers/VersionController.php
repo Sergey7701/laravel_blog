@@ -2,7 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
-use App\Version;
+use App\News;
 use Illuminate\Http\Request;
 
 class VersionController extends Controller
@@ -13,10 +13,17 @@ class VersionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Article $article)
+    public function indexArticles(Article $article)
     {
         return view('admin.versions', [
             'versions' => $article->versions()->latest()->paginate(10),
+        ]);
+    }
+
+    public function indexNews(News $news)
+    {
+        return view('admin.versionsNews', [
+            'versions' => $news->versions()->latest()->paginate(10),
         ]);
     }
 

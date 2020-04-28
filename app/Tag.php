@@ -11,6 +11,11 @@ class Tag extends Model
         'name',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+    }
+
     public function getRouteKeyName()
     {
         return 'name';

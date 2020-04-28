@@ -38,20 +38,10 @@ class Article extends Model
                 'publish'        => $entryable->publish,
             ]);
         });
-        static::updating(function ($article) {
-            $newTags = $article->newTags;
-            $oldTags = $article->oldTags;
-            unset($article->newTags, $article->oldTags);
-            return Version::create([
-                    'article_id'  => $article->id,
-                    'editor_id'   => (int) Auth::id(),
-                    'header'      => $article->header,
-                    'description' => $article->description,
-                    'text'        => $article->text,
-                    'publish'     => $article->publish,
-                    'tags'        => $newTags,
-                    'old_tags'    => $oldTags,
-            ]);
+        static::updating(function($article) {
+            if (get_class($article) === Article::class) {
+                static::makeVersion($article);
+            }
         });
         static::updated(function($entryable) {
             Entry::where('entryable_id', $entryable->id)
@@ -110,5 +100,23 @@ class Article extends Model
     public function entry()
     {
         return $this->morphOne(Entry::class, 'entryable');
+    }
+
+    private static function makeVersion($article)
+    {
+        $newTags = $article->newTags;
+        $oldTags = $article->oldTags;
+        unset($article->newTags, $article->oldTags);
+        return Version::create([
+                'article_id'  => $article->id,
+                'editor_id'   => (int) Auth::id(),
+                'header'      => $article->header,
+                'description' => $article->description,
+                'text'        => $article->text,
+                'publish'     => $article->publish,
+                'tags'        => $newTags,
+                'old_tags'    => $oldTags,
+                'type'        => get_class($article),
+        ]);
     }
 }

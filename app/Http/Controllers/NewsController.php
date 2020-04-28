@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\News;
 use Illuminate\Support\Facades\Auth;
-use App\Version;
+use App\Tag;
 
 class NewsController extends Controller
 {
@@ -108,11 +108,10 @@ class NewsController extends Controller
             'publish' => 'in:on'
         ]);
         $data['publish']  = isset($data['publish']) ? $data['publish'] : null;
-        $news->update($data);
+        $this->tags($request, $news);
         $news->newTags = $request->tags;
         $news->oldTags = $oldTags;
-        $this->tags($request, $news);
-        // $this->createVersion($oldArticle, $oldTags);
+        $news->update($data);
         \Mail::to($news->author->email)->send(new \App\Mail\ArticleModified($news));
         flash('Новость успешно изменена');
         return $news;
