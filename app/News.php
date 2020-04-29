@@ -15,21 +15,12 @@ class News extends Article
         'author_id',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::updating(function($news) {
-            static::makeVersion($news);
-        });
-    }
-
     public function versions()
     {
         return $this->hasMany(VersionNews::class);
     }
 
-    private static function makeVersion($news)
+    protected static function makeVersion($news)
     {
         $newTags = $news->newTags;
         $oldTags = $news->oldTags;

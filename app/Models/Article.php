@@ -39,9 +39,7 @@ class Article extends Model
             ]);
         });
         static::updating(function($article) {
-            if (get_class($article) === Article::class) {
-                static::makeVersion($article);
-            }
+            get_class($article)::makeVersion($article);
         });
         static::updated(function($entryable) {
             Entry::where('entryable_id', $entryable->id)

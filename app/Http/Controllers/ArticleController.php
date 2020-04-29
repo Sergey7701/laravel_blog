@@ -142,9 +142,8 @@ class ArticleController extends Controller
     }
 
     protected function updateFunction(Request $request, ArticleModel $article)
-    {
-        $oldArticle      = clone $article;
-        $oldTags         = $oldArticle->tags->implode('name', ',');
+    {        
+        $oldTags         = $article->tags->implode('name', ',');
         $data            = $this->validate($request, [
             'header'      => 'required|between:5,100',
             'description' => 'required|max:255',
@@ -153,9 +152,10 @@ class ArticleController extends Controller
         ]);
         $data['publish'] = isset($data['publish']) ? $data['publish'] : null;
         $this->tags($request, $article);
-        $article->newTags = $request->tags;
-        $article->oldTags = $oldTags;
-        $article->update($data);
+        $article->update(array_merge($data,[
+            'newTags' => $request->tags,
+            'oldTags' => $oldTags,
+        ]));
         \Mail::to($article->author->email)->send(new \App\Mail\ArticleModified($article));
         flash('Статья успешно изменена');
         return $article;

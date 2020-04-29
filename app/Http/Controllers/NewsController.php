@@ -100,8 +100,7 @@ class NewsController extends Controller
 
     protected function updateFunction(Request $request, News $news)
     {
-        $oldArticle       = clone $news;
-        $oldTags          = $oldArticle->tags->implode('name', ', ');
+        $oldTags          = $news->tags->implode('name', ', ');
         $data             = $this->validate($request, [
             'header'  => 'required|between:5,100',
             'text'    => 'required',
@@ -109,9 +108,10 @@ class NewsController extends Controller
         ]);
         $data['publish']  = isset($data['publish']) ? $data['publish'] : null;
         $this->tags($request, $news);
-        $news->newTags = $request->tags;
-        $news->oldTags = $oldTags;
-        $news->update($data);
+        $news->update(array_merge($data,[
+            'newTags' => $request->tags,
+            'oldTags' => $oldTags,
+        ]));
         \Mail::to($news->author->email)->send(new \App\Mail\ArticleModified($news));
         flash('Новость успешно изменена');
         return $news;
