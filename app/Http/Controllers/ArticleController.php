@@ -79,7 +79,7 @@ class ArticleController extends Controller
     {
         return view('show', [
             'article'  => $article,
-            'comments' => \App\Comment::where('entry_id', $news->entry->id)->orderByDesc('created_at')->paginate(10),
+            'comments' => \App\Comment::where('entry_id', $article->entry->id)->orderByDesc('created_at')->paginate(10),
         ]);
     }
 
