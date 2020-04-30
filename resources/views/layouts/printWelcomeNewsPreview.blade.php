@@ -6,11 +6,12 @@
         </a>
     </h2>
     @include ('layouts.newsBadge')
-    @php
-    @endphp    
     @include('layouts.tags', [
-    'entry' => $news,
-    'badgeStyle' => 'badge badge-info',
+        'entry' => $news,
+        'badgeStyle' => 'badge badge-info',
+    ])
+    @include('layouts.countOfComments', [
+        'entry' => $news,
     ])
     <p class="">
         <small> {{$news->created_at}}</small>

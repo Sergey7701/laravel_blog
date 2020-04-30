@@ -20,8 +20,8 @@ trait HasRolesAndPermissions
      */
     public function permissions()
     {
-        if ($this->role){
-        return $this->role->permissions();
+        if ($this->role) {
+            return $this->role->permissions();
         } else {
             return null;
         }
@@ -33,9 +33,11 @@ trait HasRolesAndPermissions
      */
     public function hasRole(... $roles)
     {
-        foreach ($roles as $role) {            
-            if ($this->role->slug === $role) {
-                return true;
+        if ($this->role) {
+            foreach ($roles as $role) {
+                if ($this->role->slug === $role) {
+                    return true;
+                }
             }
         }
         return false;
@@ -47,7 +49,11 @@ trait HasRolesAndPermissions
      */
     public function hasPermission($permissionSlug)
     {
-        return $this->permissions->contains('slug', $permissionSlug);
+        if ($this->permissions()) {
+            return $this->permissions->contains('slug', $permissionSlug);
+        } else {
+            return false;
+        }
     }
 
     /**

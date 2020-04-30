@@ -46,6 +46,7 @@ class NewsController extends Controller
     {
         return view('showNews', [
             'news' => $news,
+            'comments' => \App\Comment::where('entry_id', $news->entry->id)->orderByDesc('created_at')->paginate(10),
         ]);
     }
 

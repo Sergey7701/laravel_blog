@@ -15,10 +15,8 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        $editor         = Role::where('slug', 'editor')->first();
-        $admin          = Role::where('slug', 'administrator')->first();
-//        $createArticles = Permission::where('slug', 'create-articles')->first();
-//        $manageUsers    = Permission::where('slug', 'manage-users')->first();
+        $editor = Role::where('slug', 'editor')->first();
+        $admin  = Role::where('slug', 'administrator')->first();
         User::create([
             'name'     => 'Editor',
             'email'    => 'Editor@example.com',
@@ -31,7 +29,10 @@ class UserSeeder extends Seeder
             'password' => Hash::make('12345678'),
             'role_id'  => $admin->id,
         ]);
-        // $user2->roles()->attach($admin);
-        //$user2->permissions()->attach($manageUsers);
+        factory(User::class)->create([
+            'name'     => 'user1',
+            'email'    => 'user1@example.com',
+            'password' => Hash::make('12345678'),
+        ]);
     }
 }

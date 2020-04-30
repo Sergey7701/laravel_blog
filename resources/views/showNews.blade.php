@@ -8,22 +8,33 @@
     @endpermission
     @permission('manage-articles')
         <a class="ml-3 mb-3 text-info" href="/admin/news/{{$news->slug}}/edit">Управлять новостью</a>   
+    @else
+        @if (auth()->id() === $news->author_id)
+            <a class="mb-3" href="/news/{{$news->slug}}/edit">Редактировать</a>
+        @endif    
     @endpermission
 </div>
 <div class="row col-9">
     <div class="blog-post">
         <h2 class="blog-post-title">
-            {{$news->header}}
+            {{ $news->header }}
             @include('layouts.publishStatus', ['entry' => $news])
         </h2>
         @include ('layouts.newsBadge')
         @include('layouts.tags', [
-         'entry' => $news,
-         'badgeStyle' => 'badge badge-info',
+            'entry' => $news,
+            'badgeStyle' => 'badge badge-info',
+        ])
+        @include('layouts.countOfComments', [
+            'entry' => $news,
         ])
         <p>
-            {{$news->text}}
+            {{ $news->text }}
         </p>
+        @include('layouts.alertErrors')
+        @include('layouts.comments', [
+            'entry' => $news,
+        ])
     </div>
 </div>
 @include ('layouts.sidebar')

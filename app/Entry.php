@@ -16,4 +16,9 @@ class Entry extends Model
     {
         return $this->morphTo();
     }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

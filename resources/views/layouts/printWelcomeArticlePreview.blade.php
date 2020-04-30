@@ -9,6 +9,9 @@
         'entry' => $article,
         'badgeStyle' => 'badge badge-info',
     ])
+    @include('layouts.countOfComments', [
+        'entry' => $article,
+    ])
     <p>
         {{$article->description}}
     </p>

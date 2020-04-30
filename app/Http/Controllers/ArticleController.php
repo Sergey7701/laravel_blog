@@ -1,11 +1,16 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Entry;
+use App\Events\ArticleCreated;
+use App\Mail\ArticleDeleted;
+use App\Mail\ArticleModified;
 use App\Models\Article as ArticleModel;
+use App\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Version;
-use App\Tag;
+use mysql_xdevapi\Collection;
+use function flash;
 
 class ArticleController extends Controller
 {
@@ -24,7 +29,7 @@ class ArticleController extends Controller
     {
         session(['admin' => false]);
         return view('welcome', [
-            'entries' => \App\Entry::latest()->where('publish', true)->paginate(10),
+            'entries' => Entry::latest()->where('publish', true)->paginate(10),
             //'articles' => ArticleModel::with('tags')->where('publish', true)->latest()->paginate(10),
         ]);
     }
@@ -59,7 +64,7 @@ class ArticleController extends Controller
                 //'publish'   => isset($data['publish']) ? 1 : null,
                 'author_id' => Auth::id(),
         ]));
-        event(new \App\Events\ArticleCreated($article));
+        event(new ArticleCreated($article));
         flash('Статья успешно создана');
         return redirect('/');
     }
@@ -73,7 +78,8 @@ class ArticleController extends Controller
     public function show(ArticleModel $article)
     {
         return view('show', [
-            'article' => $article,
+            'article'  => $article,
+            'comments' => \App\Comment::where('entry_id', $news->entry->id)->orderByDesc('created_at')->paginate(10),
         ]);
     }
 
@@ -114,7 +120,7 @@ class ArticleController extends Controller
     public function destroy(ArticleModel $article)
     {
         abort_if(Auth()->user()->cannot('update', $article), 403);
-        \Mail::to($article->author->email)->send(new \App\Mail\ArticleDeleted($article));
+        \Mail::to($article->author->email)->send(new ArticleDeleted($article));
         $article->delete();
         flash('Статья успешно удалена', 'warning');
         return redirect('/');
@@ -142,7 +148,7 @@ class ArticleController extends Controller
     }
 
     protected function updateFunction(Request $request, ArticleModel $article)
-    {        
+    {
         $oldTags         = $article->tags->implode('name', ',');
         $data            = $this->validate($request, [
             'header'      => 'required|between:5,100',
@@ -152,11 +158,11 @@ class ArticleController extends Controller
         ]);
         $data['publish'] = isset($data['publish']) ? $data['publish'] : null;
         $this->tags($request, $article);
-        $article->update(array_merge($data,[
+        $article->update(array_merge($data, [
             'newTags' => $request->tags,
             'oldTags' => $oldTags,
         ]));
-        \Mail::to($article->author->email)->send(new \App\Mail\ArticleModified($article));
+        \Mail::to($article->author->email)->send(new ArticleModified($article));
         flash('Статья успешно изменена');
         return $article;
     }

@@ -28,6 +28,8 @@ Route::get('/contacts', function () {
     return view('contacts');
 });
 Route::resource('/news', 'NewsController');
+Route::resource('/news/{entry}/comment', 'CommentController');
+Route::resource('/posts/{entry}/comment', 'CommentController');
 //Admin Section
 Route::group(['middleware' => 'permission:manage-articles'], function() {
     Route::get('/admin/feedbacks', 'Feedback@index')->middleware('auth');

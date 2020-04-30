@@ -2,14 +2,16 @@
 @include ('layouts.flashMessage')
 <div class="row col-12">
     @permission('manage-articles')
-    <a class="mb-3 mr-5 text-info" href="/admin/posts">На главную для администраторов</a>
+        <a class="mb-3 mr-5 text-info" href="/admin/posts">На главную для администраторов</a>
     @else 
-    <a class="mb-3 mr-5" href="/">На главную</a>
+        <a class="mb-3 mr-5" href="/">На главную</a>
     @endpermission
     @permission('manage-articles')
-    <a class="ml-3 mb-3 text-info" href="/admin/posts/{{$article->slug}}/edit">Управлять статьёй</a>
+        <a class="ml-3 mb-3 text-info" href="/admin/posts/{{$article->slug}}/edit">Управлять статьёй</a>
     @else
-    <a class="mb-3" href="/posts/{{$article->slug}}/edit">Редактировать</a>
+        @if (auth()->id() === $article->author_id)
+            <a class="mb-3" href="/posts/{{$article->slug}}/edit">Редактировать</a>
+        @endif    
     @endpermission
 </div>
 <div class="row col-9">
@@ -22,9 +24,16 @@
             'entry' => $article,
             'badgeStyle' => 'badge badge-info',
         ])
+        @include('layouts.countOfComments', [
+            'entry' => $article,
+        ])
         <p>
             {{$article->text}}
         </p>
+        @include('layouts.alertErrors')
+        @include('layouts.comments', [
+            'entry' => $article,
+        ])
     </div>
 </div>
 @include ('layouts.sidebar')
