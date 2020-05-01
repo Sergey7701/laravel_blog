@@ -27,6 +27,10 @@ Route::get('/contacts', function () {
     session(['admin' => false]);
     return view('contacts');
 });
+Route::get('/statistic', function () {
+    session(['admin' => false]);
+    return view('statistic');
+});
 Route::resource('/news', 'NewsController');
 Route::resource('/news/{entry}/comment', 'CommentController');
 Route::resource('/posts/{entry}/comment', 'CommentController');

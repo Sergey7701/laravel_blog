@@ -14,6 +14,22 @@ class TagController extends Controller
 
     public function index(Tag $tag)
     {
+        /* Почему идёт выборка Entry?
+         * Я хочу выводить вместе и Article и News, привязанные к тегам.
+         * 
+         * Почему не выборка из отдельных таблиц Article и News?
+         * Потому что отображение welcome хочет именно Entry.
+         * Ну или делать отдельное отображение, а уже там определять тип выводимой записи.
+         * В итоге тоже самое, но больше операций.
+         * 
+         * Почему так?
+         * Tag можно привязывать не к каждому подтипу Entry,
+         * а Comment привязывается ко всем Entry
+         * 
+         * Почему используется orWhere?
+         * Article и News могут иметь одинаковые id  в своих таблицах,
+         * поэтому выборка по только taggable_id даёт много ошибочных коллизий
+         */ 
         $entries = Entry::where('entryable_type', News::class)
             ->whereIn('entryable_id',
                       \DB::table('taggables')

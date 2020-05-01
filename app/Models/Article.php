@@ -6,7 +6,6 @@ use App\Tag;
 use App\User;
 use App\Version;
 use Cviebrock\EloquentSluggable\Sluggable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,6 +22,8 @@ class Article extends Entry
         'text',
         'publish',
         'author_id',
+        'newTags',
+        'oldTags',
     ];
     protected $casts    = [
         'publish' => 'boolean',
@@ -98,6 +99,10 @@ class Article extends Entry
     public function entry()
     {
         return $this->morphOne(Entry::class, 'entryable');
+    }
+    public function comments()
+    {
+        return $this->entry->comments();
     }
 
     private static function makeVersion($article)

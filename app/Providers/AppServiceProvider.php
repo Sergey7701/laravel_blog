@@ -30,5 +30,8 @@ class AppServiceProvider extends ServiceProvider
         Blade::if('permission', function ($permissionSlug) {
             return \auth()->check() && \auth()->user()->hasPermission($permissionSlug);
         });
+        Blade::if('authorized', function () {
+            return \auth()->check();
+        });
     }
 }

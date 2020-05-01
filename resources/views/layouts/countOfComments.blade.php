@@ -1,3 +1,3 @@
 <p>
-    Комментариев: {{ count($entry->entry->comments) }}
+    Комментариев: {{ count($entry->comments) }}
 </p>

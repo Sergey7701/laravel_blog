@@ -24,12 +24,15 @@ class ArticleController extends Controller
             ]
         ]);
     }
+    /* Почему идёт выборка Entry, а не Article?
+     * Я хочу на главной выводить новости и статьи вперемешку
+     */
 
     public function index()
     {
         session(['admin' => false]);
         return view('welcome', [
-            'entries' => Entry::latest()->where('publish', true)->paginate(10),
+            'entries' => Entry::with('entryable')->latest()->where('publish', true)->paginate(10),
             //'articles' => ArticleModel::with('tags')->where('publish', true)->latest()->paginate(10),
         ]);
     }
@@ -79,7 +82,7 @@ class ArticleController extends Controller
     {
         return view('show', [
             'article'  => $article,
-            'comments' => \App\Comment::where('entry_id', $article->entry->id)->orderByDesc('created_at')->paginate(10),
+            'comments' => $article->comments()->orderByDesc('created_at')->paginate(10),
         ]);
     }
 

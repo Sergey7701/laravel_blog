@@ -53,7 +53,10 @@
                             <a class="p-2 text-muted" href="/about">О нас</a>
                             <a class="p-2 text-muted" href="/contacts">Контакты</a>
                             <a class="p-2 text-muted" href="/posts/create">Новая статья</a>
-                            <a class="p-2 text-muted" href="/admin/">Административный раздел</a>
+                            <a class="p-2 text-muted" href="/statistic">Статистика сайта</a>
+                            @permission('manage-articles')
+                                <a class="p-2 text-muted" href="/admin/">Административный раздел</a>
+                            @endpermission
                         </nav>
                     </div>
             @php

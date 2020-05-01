@@ -6,6 +6,10 @@ use App\Entry;
 
 class CommentController extends Controller
 {
+     function __construct()
+    {
+        $this->middleware('auth');
+    }
 
     /**
      * Display a listing of the resource.
@@ -41,8 +45,9 @@ class CommentController extends Controller
         \App\Comment::create([
             'author_id' => auth()->id(),
             'entry_id'  => $entry->id,
-            'text'      => $request->text,
+            'text'      => $data['text'],
         ]);
+        flash('Комментарий успешно добавлен');
         return redirect(url()->previous());
     }
 

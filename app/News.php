@@ -13,6 +13,8 @@ class News extends Article
         'text',
         'publish',
         'author_id',
+        'newTags',
+        'oldTags',
     ];
 
     public function versions()
