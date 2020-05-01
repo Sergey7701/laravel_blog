@@ -20,6 +20,7 @@
             {{$article->header}}
             @include('layouts.publishStatus', ['entry' => $article])
         </h2>
+        {{ $article->created_at->diffForHumans() }}
         @include('layouts.tags', [
             'entry' => $article,
             'badgeStyle' => 'badge badge-info',

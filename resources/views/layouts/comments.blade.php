@@ -14,7 +14,7 @@
         {{ $comment->text }}
     </p>    
     <p class="col-12">
-        <small>{{ $comment->author->name }}</small>
+        <small>{{ $comment->author->name }}, {{ $comment->created_at->diffForHumans() }}</small>
     </p>    
 @endforeach  
 {{ $comments->links() }}

@@ -21,6 +21,9 @@
             @include('layouts.publishStatus', ['entry' => $news])
         </h2>
         @include ('layouts.newsBadge')
+        <p>
+            {{ $news->created_at->diffForHumans() }}
+        </p>
         @include('layouts.tags', [
             'entry' => $news,
             'badgeStyle' => 'badge badge-info',
