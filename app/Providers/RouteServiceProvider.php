@@ -2,6 +2,7 @@
 namespace App\Providers;
 
 use App\Models\Article as ArticleModel;
+use App\News;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
 
@@ -35,12 +36,20 @@ class RouteServiceProvider extends ServiceProvider
 
         parent::boot();
         Route::bind('post', function($slug) {
-            if (\auth()->check() && !\auth()->user()->hasRole('administrator')) {
+            if (!\auth()->check() || !\auth()->user()->hasRole('administrator', 'editor')) {
                 return ArticleModel::where('slug', $slug)->where('publish', 1)->first();
             } else {
                 return ArticleModel::where('slug', $slug)->first();
             }
         });
+        Route::bind('news', function($slug) {
+            if (!\auth()->check() || !\auth()->user()->hasRole('administrator', 'editor')) {
+                return News::where('slug', $slug)->where('publish', 1)->first();
+            } else {
+                return News::where('slug', $slug)->first();
+            }
+        });
+        
     }
 
     /**

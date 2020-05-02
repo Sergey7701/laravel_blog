@@ -1,9 +1,14 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Article;
+use App\Entry;
+use App\Events\ArticleCreated;
+use App\Mail\ArticleDeleted;
 use App\Models\Article as ArticleModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use function flash;
 
 class AdminArticleController extends ArticleController
 {
@@ -20,8 +25,9 @@ class AdminArticleController extends ArticleController
 
     public function index()
     {
+        session(['admin' => true]);
         return view('admin.welcome', [
-            'articles' => ArticleModel::with('tags')->latest()->paginate(10),
+            'entries' => Entry::latest()->paginate(10),
         ]);
     }
 
@@ -53,7 +59,7 @@ class AdminArticleController extends ArticleController
                 'publish'   => isset($data['publish']) ? 1 : null,
                 'author_id' => Auth::id(),
         ]));
-        event(new \App\Events\ArticleCreated($article));
+        event(new ArticleCreated($article));
         flash('Статья успешно создана');
         return redirect('/');
     }
@@ -61,7 +67,7 @@ class AdminArticleController extends ArticleController
     /**
      * Display the specified resource.
      *
-     * @param  \App\Article  $article
+     * @param  Article  $article
      * @return \Illuminate\Http\Response
      */
     public function show(ArticleModel $article)
@@ -74,13 +80,12 @@ class AdminArticleController extends ArticleController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Article  $article
+     * @param  Article  $article
      * @return \Illuminate\Http\Response
      */
     public function edit(ArticleModel $article)
     {
         //abort_if(\Gate::denies('update', $article), 403);
-
         return view('admin.edit', [
             'article' => $article,
         ]);
@@ -90,35 +95,24 @@ class AdminArticleController extends ArticleController
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Article  $article
+     * @param  Article  $article
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, ArticleModel $article)
     {
-        $data = $this->validate($request, [
-            'header'      => 'required|between:5,100',
-            'description' => 'required|max:255',
-            'text'        => 'required',
-            'publish'     => 'in:on'
-        ]);
-        $article->update(array_merge($data, [
-            'publish' => isset($data['publish']) ? 1 : null,
-        ]));
-        $this->tags($request, $article);
-        \Mail::to($article->author->email)->send(new \App\Mail\ArticleModified($article));
-        flash('Статья успешно изменена');
+        $article = $this->updateFunction($request, $article);
         return redirect("/posts/$article->slug");
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Article  $article
+     * @param  Article  $article
      * @return \Illuminate\Http\Response
      */
     public function destroy(ArticleModel $article)
     {
-        \Mail::to($article->author->email)->send(new \App\Mail\ArticleDeleted($article));
+        \Mail::to($article->author->email)->send(new ArticleDeleted($article));
         $article->delete();
         flash('Статья успешно удалена', 'warning');
         return redirect('/');

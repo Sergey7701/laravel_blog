@@ -1,10 +1,11 @@
 <?php
 namespace App;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Article;
+use App\Traits\HasRolesAndPermissions;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Traits\HasRolesAndPermissions;
+use App\News;
 
 class User extends Authenticatable
 {
@@ -44,6 +45,10 @@ class User extends Authenticatable
     
     public function articles()
     {
-        return $this->hasMany(Models\Article::class, 'author_id');
+        return $this->hasMany(Article::class, 'author_id');
+    }
+    public function news()
+    {
+        return $this->hasMany(News::class, 'author_id');
     }
 }

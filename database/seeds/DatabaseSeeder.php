@@ -1,5 +1,12 @@
 <?php
 
+use App\Comment;
+use App\Models\Article;
+use App\News;
+use App\Permission;
+use App\Role;
+use App\Tag;
+use App\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -12,27 +19,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        factory(App\Tag::class, 20)->create();
-        factory(\App\User::class)->create([
-            'name'     => 'user1',
-            'email'    => 'user1@example.com',
-            'password' => Hash::make('12345678'),
-        ]);
         $this->call(RoleSeeder::class);
-        $this->call(PermissionSeeder::class);     
-        App\Permission::where('slug', 'manage-users')->first()->roles()
+        $this->call(PermissionSeeder::class);
+        factory(Tag::class, 20)->create();
+        Permission::where('slug', 'manage-users')->first()->roles()
             ->sync([
-                App\Role::where('slug', 'administrator')->first()->id,
+                Role::where('slug', 'administrator')->first()->id,
         ]);
-        App\Permission::where('slug', 'manage-articles')->first()->roles()
+        Permission::where('slug', 'manage-articles')->first()->roles()
             ->sync([
-                App\Role::where('slug', 'administrator')->first()->id,
-                App\Role::where('slug', 'editor')->first()->id,
+                Role::where('slug', 'administrator')->first()->id,
+                Role::where('slug', 'editor')->first()->id,
         ]);
         $this->call(UserSeeder::class);
-        factory(App\User::class, 2)->create()->each(function($user) {
-            $user->articles()->saveMany(factory(App\Models\Article::class, (int) rand(10, 20))->make());
+        factory(User::class, 2)->create()->each(function($user) {
+            $user->articles()->saveMany(factory(Article::class, (int) rand(10, 20))->make());
+            $user->news()->saveMany(factory(News::class, (int) rand(10, 20))->make());
         });
-        $this->call(ArticleTagTableSeeder::class);
+        $this->call(EntryTagTableSeeder::class);
+        factory(Comment::class, 300)->create();
     }
 }

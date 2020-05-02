@@ -18,6 +18,8 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('email');
             $table->string('password');
+            $table->bigInteger('role_id')->unsigned()->nullable();
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('set null');
             $table->string('remember_token')->nullable();
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();

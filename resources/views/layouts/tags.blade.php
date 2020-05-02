@@ -1,5 +1,5 @@
 @php
-    $tags = $article->tags ?? collect();
+    $tags = $entry->tags ?? collect();
     $badgeStyle = $badgeStyle ?? '';
 @endphp
 <p class="col-9">

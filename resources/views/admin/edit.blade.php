@@ -1,13 +1,9 @@
 @include('layouts.header', ['title' => 'Редактировать статью'])
 @include ('layouts.adminHeader')
 <div class="row col-9">
-@role('administrator')
-    @role('administrator')
-        @if (Auth::user()->can('manage-articles'))
-            <a class="mb-3 ml-5 text-info" href="/admin/posts">На главную для администраторов</a>
-        @endif
-    @endcan
-        @if (Auth::user()->can('manage-articles'))
+    @permission('manage-articles')
+        <a class="mb-3 ml-5 text-info" href="/admin/posts">На главную для администраторов</a>
+        <a class="mb-3 ml-5 text-info" href="/admin/posts/{{ $article->slug }}/versions">История изменений статьи</a>
             <h2 class="col-12">
                 Редактировать статью <span style="color: lightgrey">{{ $article->slug }}</span>
             </h2>
@@ -32,7 +28,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-check-label" for="publish">Теги</label>
-                    <input type="text" class="form-control" name="tags" id="inputTags" value="{{ trim(old('tags',$article->tags->pluck('name')->implode(', '))) }}">
+                    <input type="text" class="form-control" name="tags" id="inputTags" value="{{ trim(old('tags',$article->tags->pluck('name')->implode(','))) }}">
                 </div>
                 <div class="form-group form-check">
                     <input type="checkbox" class="form-check-input" name="publish" id="publish" {{ old('publish', $article->publish) ? 'checked' : '' }}>
@@ -46,7 +42,7 @@
                 <input type="submit" class="btn btn-danger" value="Delete">
             </form>
     @endif
-@endcan
+
 </div>
 @include ('layouts.sidebar')
 @include ('layouts.footer')

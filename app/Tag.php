@@ -1,6 +1,7 @@
 <?php
 namespace App;
 
+use App\Models\Article;
 use Illuminate\Database\Eloquent\Model;
 
 class Tag extends Model
@@ -10,6 +11,11 @@ class Tag extends Model
         'name',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+    }
+
     public function getRouteKeyName()
     {
         return 'name';
@@ -17,11 +23,26 @@ class Tag extends Model
 
     public function articles()
     {
-        return $this->belongsToMany(\App\Models\Article::class);
+        return $this->morphedByMany(Article::class, 'taggable');
+    }
+
+    public function news()
+    {
+        return $this->morphedByMany(News::class, 'taggable');
     }
 
     public static function tagsCloud()
     {
-        return (new static)->has('articles')->get();
+        return ((new static)->whereHas('articles', function ($query) {
+                    if (!\auth()->check() || !\auth()->user()->can('manage-articles')) {
+                        $query->wherePublish(1);
+                    }
+                })->get())
+                ->merge(
+                    ((new static)->whereHas('news', function ($query) {
+                        if (!\auth()->check() || !\auth()->user()->can('manage-articles')) {
+                            $query->wherePublish(1);
+                        }
+                    })->get()));
     }
 }

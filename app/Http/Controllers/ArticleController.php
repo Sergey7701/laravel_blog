@@ -1,9 +1,16 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Entry;
+use App\Events\ArticleCreated;
+use App\Mail\ArticleDeleted;
+use App\Mail\ArticleModified;
 use App\Models\Article as ArticleModel;
+use App\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use mysql_xdevapi\Collection;
+use function flash;
 
 class ArticleController extends Controller
 {
@@ -17,12 +24,16 @@ class ArticleController extends Controller
             ]
         ]);
     }
+    /* Почему идёт выборка Entry, а не Article?
+     * Я хочу на главной выводить новости и статьи вперемешку
+     */
 
     public function index()
     {
-        //dd(ArticleModel::all());
+        session(['admin' => false]);
         return view('welcome', [
-            'articles' => ArticleModel::with('tags')->where('publish', true)->latest()->paginate(10),
+            'entries' => Entry::with('entryable')->latest()->where('publish', true)->paginate(10),
+            //'articles' => ArticleModel::with('tags')->where('publish', true)->latest()->paginate(10),
         ]);
     }
 
@@ -56,7 +67,7 @@ class ArticleController extends Controller
                 //'publish'   => isset($data['publish']) ? 1 : null,
                 'author_id' => Auth::id(),
         ]));
-        event(new \App\Events\ArticleCreated($article));
+        event(new ArticleCreated($article));
         flash('Статья успешно создана');
         return redirect('/');
     }
@@ -70,7 +81,8 @@ class ArticleController extends Controller
     public function show(ArticleModel $article)
     {
         return view('show', [
-            'article' => $article,
+            'article'  => $article,
+            'comments' => $article->comments()->orderByDesc('created_at')->paginate(10),
         ]);
     }
 
@@ -98,18 +110,7 @@ class ArticleController extends Controller
     public function update(Request $request, ArticleModel $article)
     {
         abort_if(Auth()->user()->cannot('update', $article), 403);
-        $data = $this->validate($request, [
-            'header'      => 'required|between:5,100',
-            'description' => 'required|max:255',
-            'text'        => 'required',
-            'publish'     => 'in:on'
-        ]);
-        $article->update(array_merge($data, [
-            'publish' => isset($data['publish']) ? 1 : null,
-        ]));
-        $this->tags($request, $article);
-        \Mail::to($article->author->email)->send(new \App\Mail\ArticleModified($article));
-        flash('Статья успешно изменена');
+        $article = $this->updateFunction($request, $article);
         return redirect("/posts/$article->slug");
     }
 
@@ -122,7 +123,7 @@ class ArticleController extends Controller
     public function destroy(ArticleModel $article)
     {
         abort_if(Auth()->user()->cannot('update', $article), 403);
-        \Mail::to($article->author->email)->send(new \App\Mail\ArticleDeleted($article));
+        \Mail::to($article->author->email)->send(new ArticleDeleted($article));
         $article->delete();
         flash('Статья успешно удалена', 'warning');
         return redirect('/');
@@ -137,16 +138,35 @@ class ArticleController extends Controller
         });
         $syncIds      = $existTags->intersectByKeys($requestTags)->pluck('id')->toArray();
         $tagsToAttach = $requestTags->diffKeys($existTags);
-//        $tagsToDetach = $existTags->diffKeys($requestTags);
-        foreach ($tagsToAttach as $tag) {
-            $tag       = \App\Tag::firstOrCreate(['name' => $tag]);
-//            $article->tags()->attach($tag);
-            $syncIds[] = $tag->id;
+        if (count($tagsToAttach)) {
+            foreach ($tagsToAttach as $tag) {
+                if (strlen($tag)) {
+                    $tag       = Tag::firstOrCreate(['name' => $tag]);
+                    $syncIds[] = $tag->id;
+                }
+            }
         }
-//        foreach ($tagsToDetach as $tag) {
-//            $article->tags()->detach($tag);
-//        }
-        //dd($syncIds);
         $article->tags()->sync($syncIds);
+        return $article;
+    }
+
+    protected function updateFunction(Request $request, ArticleModel $article)
+    {
+        $oldTags         = $article->tags->implode('name', ',');
+        $data            = $this->validate($request, [
+            'header'      => 'required|between:5,100',
+            'description' => 'required|max:255',
+            'text'        => 'required',
+            'publish'     => 'in:on'
+        ]);
+        $data['publish'] = isset($data['publish']) ? $data['publish'] : null;
+        $this->tags($request, $article);
+        $article->update(array_merge($data, [
+            'newTags' => $request->tags,
+            'oldTags' => $oldTags,
+        ]));
+        \Mail::to($article->author->email)->send(new ArticleModified($article));
+        flash('Статья успешно изменена');
+        return $article;
     }
 }

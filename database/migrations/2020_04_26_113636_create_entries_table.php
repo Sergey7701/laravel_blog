@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateNewTable extends Migration
+class CreateEntriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,12 @@ class CreateNewTable extends Migration
      */
     public function up()
     {
-        Schema::create('new', function (Blueprint $table) {
-            $table->bigIncrements('id');
+        Schema::create('entries', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('entryable_id');
+            $table->boolean('publish')->nullable();
+            $table->string('entryable_type');
+            $table->unique(['entryable_id', 'entryable_type']);
             $table->timestamps();
         });
     }
@@ -26,6 +30,6 @@ class CreateNewTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('new');
+        Schema::dropIfExists('entries');
     }
 }

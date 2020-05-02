@@ -20,14 +20,31 @@ Route::get('/', 'ArticleController@index');
 Route::get('/home', 'HomeController@index');
 Route::get('/posts/tags/{tag}/', 'TagController@index');
 Route::get('/about', function () {
+    session(['admin' => false]);
     return view('about');
 });
 Route::get('/contacts', function () {
+    session(['admin' => false]);
     return view('contacts');
 });
-Route::group(['middleware' => 'role:administrator'], function() {
-    Route::resource('/admin/posts', 'AdminArticleController');
-    Route::get('/admin/feedbacks', 'Feedback@index')->middleware('auth');
-    Route::get('/admin/{post}/versions', 'VersionController@index');
+Route::get('/statistic', function () {
+    session(['admin' => false]);
+    return view('statistic');
 });
+Route::resource('/news', 'NewsController');
+Route::resource('/news/{entry}/comment', 'CommentController');
+Route::resource('/posts/{entry}/comment', 'CommentController');
+//Admin Section
+Route::group(['middleware' => 'permission:manage-articles'], function() {
+    Route::get('/admin/feedbacks', 'Feedback@index')->middleware('auth');
+    Route::resource('/admin/posts', 'AdminArticleController');
+    Route::get('/admin/posts/{post}/versions', 'VersionController@indexArticles');
+    Route::get('/admin/news/{news}/versions', 'VersionController@indexNews');
+    Route::get('/admin', function (){
+        session(['admin' => true]);
+        return redirect('/admin/posts');
+    });
+    Route::resource('/admin/news', 'AdminNewsController');
+});
+
 

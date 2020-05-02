@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class ArticleTagTableSeeder extends Seeder
+class EntryTagTableSeeder extends Seeder
 {
 
     /**
@@ -18,6 +18,13 @@ class ArticleTagTableSeeder extends Seeder
                 $tagArr[] = (App\Tag::orderByRaw("RAND()")->first())->id;
             }
             $article->tags()->sync($tagArr);
+        });
+        App\News::all()->map(function ($news) {
+            $j = (int) rand(1, 5);
+            for ($i = 0; $i < $j; ++$i) {
+                $tagArr[] = (App\Tag::orderByRaw("RAND()")->first())->id;
+            }
+            $news->tags()->sync($tagArr);
         });
     }
 }

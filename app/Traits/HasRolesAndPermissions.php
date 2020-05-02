@@ -10,9 +10,9 @@ trait HasRolesAndPermissions
     /**
      * @return mixed
      */
-    public function roles()
+    public function role()
     {
-        return $this->belongsToMany(Role::class, $this->rolesTable);
+        return $this->belongsTo(Role::class);
     }
 
     /**
@@ -20,7 +20,11 @@ trait HasRolesAndPermissions
      */
     public function permissions()
     {
-        return $this->belongsToMany(Permission::class, $this->permissionsTable);
+        if ($this->role) {
+            return $this->role->permissions();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -29,21 +33,27 @@ trait HasRolesAndPermissions
      */
     public function hasRole(... $roles)
     {
-        foreach ($roles as $role) {
-            if ($this->roles->contains('slug', $role)) {
-                return true;
+        if ($this->role) {
+            foreach ($roles as $role) {
+                if ($this->role->slug === $role) {
+                    return true;
+                }
             }
         }
         return false;
     }
 
     /**
-     * @param $permission
+     * @param string $permissionSlug
      * @return bool
      */
     public function hasPermission($permissionSlug)
     {
-        return (bool) $this->permissions->where('slug', $permissionSlug)->count();
+        if ($this->permissions()) {
+            return $this->permissions->contains('slug', $permissionSlug);
+        } else {
+            return false;
+        }
     }
 
     /**
