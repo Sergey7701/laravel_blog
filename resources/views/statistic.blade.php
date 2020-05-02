@@ -81,8 +81,7 @@ use App\Tag;
                 ->first()
                 )
                     ->first();
-$prefix = ($entry->entryable_type === 'App\News') ? 'news' : 'posts';
-
+    $prefix = ($entry->entryable_type === 'App\News') ? 'news' : 'posts';
 @endphp
 <p class="col-12 ">
     Самая комментируемая запись: <a href="{{ '/'.$prefix.'/'.$entry->entryable->slug }}">{{ $entry->entryable->header }}</a>
@@ -113,18 +112,50 @@ $prefix = ($entry->entryable_type === 'App\News') ? 'news' : 'posts';
                 ->first()     
     }}
 </p>
-@php 
-   $article = Article::wherePublish(1)->whereId(
-    DB::table('versions')
-    ->pluck('article_id')
-    ->countBy()
-    ->sortDesc()           
-    ->keys()
-   )->first()
+@php
+    if (App\Version::all()->count()) {
+        $article = Article::wherePublish(1)->whereId(
+            DB::table('versions')
+            ->pluck('article_id')
+            ->countBy()
+            ->sortDesc()           
+            ->keys()
+       )->first()
 @endphp
 <p class="col-12">
     Самая часто меняемая статья: <a href="/post/{{ $article->slug }}">{{ $article->header}}</a>
 </p>
+@php
+    } else {
+@endphp      
+    <p class="col-12">
+        Самая часто меняемая статья: пока статьи не редактировались
+    </p>
+@php
+    }
+@endphp  
+@php
+    if (App\VersionNews::all()->count()) {
+        $news = News::wherePublish(1)->whereId(
+            DB::table('version_news')
+            ->pluck('news_id')
+            ->countBy()
+            ->sortDesc()           
+            ->keys()
+       )->first()
+@endphp
+<p class="col-12">
+    Самая часто меняемая новость: <a href="/news/{{ $news->slug }}">{{ $news->header}}</a>
+</p>
+@php
+    } else {
+@endphp      
+    <p class="col-12">
+        Самая часто меняемая новость: пока новости не редактировались
+    </p>
+@php
+    }
+@endphp  
 <p class="col-12">
     Тегов на сайте: {{ DB::table('tags')->count() }}
 </p>  
