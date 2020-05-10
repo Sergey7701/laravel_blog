@@ -39,7 +39,6 @@ class NewsController extends Controller
             'publish' => 'in:on'
         ]);
         $news = News::create(array_merge($data, [
-                //'publish'   => isset($data['publish']) ? 1 : null,
                 'author_id' => Auth::id(),
         ]));
         event(new \App\Events\ArticleCreated($news));
