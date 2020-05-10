@@ -119,7 +119,6 @@ class Article extends Entry
                 'publish'     => $article->publish,
                 'tags'        => $newTags,
                 'old_tags'    => $oldTags,
-                'type'        => get_class($article),
         ]);
     }
 }

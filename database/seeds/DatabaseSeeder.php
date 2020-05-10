@@ -37,6 +37,6 @@ class DatabaseSeeder extends Seeder
             $user->news()->saveMany(factory(News::class, (int) rand(10, 20))->make());
         });
         $this->call(EntryTagTableSeeder::class);
-        factory(Comment::class, 300)->create();
+        $this->call(CommentTableSeeder::class);
     }
 }

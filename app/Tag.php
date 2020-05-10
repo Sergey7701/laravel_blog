@@ -34,15 +34,15 @@ class Tag extends Model
     public static function tagsCloud()
     {
         return ((new static)->whereHas('articles', function ($query) {
-                    if (!\auth()->check() || !\auth()->user()->can('manage-articles')) {
+                    $query->when(!\auth()->check() || !\auth()->user()->can('manage-articles'), function ($query) {
                         $query->wherePublish(1);
-                    }
+                    });
                 })->get())
                 ->merge(
                     ((new static)->whereHas('news', function ($query) {
-                        if (!\auth()->check() || !\auth()->user()->can('manage-articles')) {
+                        $query->when(!\auth()->check() || !\auth()->user()->can('manage-articles'), function ($query) {
                             $query->wherePublish(1);
-                        }
+                        });
                     })->get()));
     }
 }
