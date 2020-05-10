@@ -22,9 +22,8 @@ trait HasRolesAndPermissions
     {
         if ($this->role) {
             return $this->role->permissions();
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**

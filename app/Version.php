@@ -1,6 +1,7 @@
 <?php
 namespace App;
 
+use App\Models\Article;
 use Illuminate\Database\Eloquent\Model;
 
 class Version extends Model
@@ -16,24 +17,10 @@ class Version extends Model
         'text',
         'publish',
     ];
-    protected static function boot(){
-        parent::boot();
-        static::creating(function ($version){
-            if ($version->type === Models\Article::class){
-                unset ($version->type);
-            }
-            if ($version->type === News::class){
-                dd($version->toArray());
-                VersionNews::create($version->toArray());
-            }
-        });
-            
-        
-    }
 
     public function article()
     {
-        return $this->belongsTo(\App\Models\Article::class);
+        return $this->belongsTo(Article::class);
     }
 
     public function editor()
@@ -69,6 +56,4 @@ class Version extends Model
         $this->attributes['publish']     = $newValue ? 1 : 0;
         $this->attributes['old_publish'] = $this->recentArticle()->publish;
     }
-
-   
 }

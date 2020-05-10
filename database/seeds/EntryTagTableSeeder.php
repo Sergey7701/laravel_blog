@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Article;
+use App\News;
+use App\Tag;
 use Illuminate\Database\Seeder;
 
 class EntryTagTableSeeder extends Seeder
@@ -12,17 +15,17 @@ class EntryTagTableSeeder extends Seeder
      */
     public function run()
     {
-        App\Models\Article::all()->map(function ($article) {
+        Article::all()->map(function ($article) {
             $j = (int) rand(1, 5);
             for ($i = 0; $i < $j; ++$i) {
-                $tagArr[] = (App\Tag::orderByRaw("RAND()")->first())->id;
+                $tagArr[] = (Tag::inRandomOrder()->first())->id;
             }
             $article->tags()->sync($tagArr);
         });
-        App\News::all()->map(function ($news) {
+        News::all()->map(function ($news) {
             $j = (int) rand(1, 5);
             for ($i = 0; $i < $j; ++$i) {
-                $tagArr[] = (App\Tag::orderByRaw("RAND()")->first())->id;
+                $tagArr[] = (Tag::inRandomOrder()->first())->id;
             }
             $news->tags()->sync($tagArr);
         });

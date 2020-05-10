@@ -18,7 +18,7 @@ class CommentController extends Controller
      */
     public function index()
     {
-        //
+        return redirect('/');
     }
 
     /**
@@ -28,7 +28,7 @@ class CommentController extends Controller
      */
     public function create()
     {
-        //
+        return redirect('/');
     }
 
     /**
@@ -59,7 +59,7 @@ class CommentController extends Controller
      */
     public function show($id)
     {
-        //
+        return redirect('/');
     }
 
     /**
@@ -70,7 +70,7 @@ class CommentController extends Controller
      */
     public function edit($id)
     {
-        //
+        return redirect('/');
     }
 
     /**
@@ -82,7 +82,7 @@ class CommentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        return redirect('/');
     }
 
     /**
@@ -93,6 +93,6 @@ class CommentController extends Controller
      */
     public function destroy($id)
     {
-        //
+        return redirect('/');
     }
 }

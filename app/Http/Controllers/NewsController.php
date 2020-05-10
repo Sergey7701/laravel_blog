@@ -19,6 +19,11 @@ class NewsController extends Controller
         ]);
     }
 
+    public function index($param)
+    {
+        return redirect('/');
+    }
+
     public function create()
     {
         return view('createNews', [
@@ -45,14 +50,14 @@ class NewsController extends Controller
     public function show(News $news)
     {
         return view('showNews', [
-            'news' => $news,
+            'news'     => $news,
             'comments' => $news->comments()->orderByDesc('created_at')->paginate(10),
         ]);
     }
 
     public function edit(News $news)
     {
-        
+        return redirect('/');
     }
 
     /**
@@ -64,7 +69,7 @@ class NewsController extends Controller
      */
     public function update(Request $request, News $news)
     {
-        
+        return redirect('/');
     }
 
     /**
@@ -75,7 +80,7 @@ class NewsController extends Controller
      */
     public function destroy(News $news)
     {
-        
+        return redirect('/');
     }
 
     protected function tags(Request $request, News $news)
@@ -101,15 +106,15 @@ class NewsController extends Controller
 
     protected function updateFunction(Request $request, News $news)
     {
-        $oldTags          = $news->tags->implode('name', ', ');
-        $data             = $this->validate($request, [
+        $oldTags         = $news->tags->implode('name', ', ');
+        $data            = $this->validate($request, [
             'header'  => 'required|between:5,100',
             'text'    => 'required',
             'publish' => 'in:on'
         ]);
-        $data['publish']  = isset($data['publish']) ? $data['publish'] : null;
+        $data['publish'] = isset($data['publish']) ? $data['publish'] : null;
         $this->tags($request, $news);
-        $news->update(array_merge($data,[
+        $news->update(array_merge($data, [
             'newTags' => $request->tags,
             'oldTags' => $oldTags,
         ]));
