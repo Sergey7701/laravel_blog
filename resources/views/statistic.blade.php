@@ -1,89 +1,59 @@
-<?php
-
-use App\Models\Article;
-use App\News;
-use App\Tag;
-use App\Entry;
-use App\User;
-use App\Comment;
-use App\Version;
-use App\VersionNews;
-
-?>
 @include ('layouts.header', ['title' => 'Статистика сайта'])
 <h3>Статистика сайта:</h3>
 <p class="col-12">
-    Всего опубликованных записей: {{ Entry::wherePublish(1)->count() }}
+    Всего опубликованных записей: {{ \App\Entry::wherePublish(1)->count() }}
 </p>
 <p class="col-12 mr-1">
-    - из них статей: {{ Entry::wherePublish(1)->whereEntryableType(Article::class)->count() }}
+    - из них статей: {{ \App\Entry::wherePublish(1)->whereEntryableType(\App\Models\Article::class)->count() }}
 </p>
 <p class="col-12 mr-1">
-    - из них новостей: {{ Entry::wherePublish(1)->whereEntryableType(News::class)->count() }}
+    - из них новостей: {{ \App\Entry::wherePublish(1)->whereEntryableType(\App\News::class)->count() }}
 </p>
 <p class="col-12">
-    Самый длинный текст у статьи: {{ Article::selectRaw('max(length(`text`)) ')->pluck("max(length(`text`))")->toArray()[0] }}
+    Самый длинный текст у статьи: {{ \App\Models\Article::selectRaw('max(length(`text`)) ')->pluck("max(length(`text`))")->toArray()[0] }}
 </p>    
 <p class="col-12">
-    Самый длинный текст у новости: {{ News::selectRaw(' max(length(`text`)) ')->pluck("max(length(`text`))")->toArray()[0] }} 
+    Самый длинный текст у новости: {{ \App\News::selectRaw(' max(length(`text`)) ')->pluck("max(length(`text`))")->toArray()[0] }} 
 </p>
 <p class="col-12">
-    Самый короткий текст у статьи: {{ Article::selectRaw(' min(length(`text`)) ')->pluck("min(length(`text`))")->toArray()[0] }}
+    Самый короткий текст у статьи: {{ \App\Models\Article::selectRaw(' min(length(`text`)) ')->pluck("min(length(`text`))")->toArray()[0] }}
 </p>    
 <p class="col-12">
-    Самый короткий текст у новости: {{ News::selectRaw(' min(length(`text`)) ')->pluck("min(length(`text`))")->toArray()[0] }} 
+    Самый короткий текст у новости: {{ \App\News::selectRaw(' min(length(`text`)) ')->pluck("min(length(`text`))")->toArray()[0] }} 
 </p>
 <p class="col-12">
-    Всего зарегистрированных пользователей: {{ User::count() }}
-</p>
-<p class="col-12 mr-1">
-    - из них опубликовали хотя бы одну запись: {{ User::whereIn('id', 
-            array_merge(
-                DB::table('news')->wherePublish(1)->pluck('author_id')->toArray(), 
-                DB::table('articles')->wherePublish(1)->pluck('author_id')->toArray()
-            )
-        )->count() }}
-</p>
-<p class="col-12 ">
-    Самый пишущий автор: {{ User::where('id', 
-                            DB::table('articles')
-                                ->wherePublish(1)
-                                ->pluck('author_id')
-                                ->merge(
-                            DB::table('news')
-                                ->wherePublish(1)
-                                ->pluck('author_id'))
-                                ->countBy()
-                                ->sortDesc()
-                                ->keys()
-                                ->first()
-                )->first()->name }}
-</p>
-<p class="col-12 mr-1">
-    - у него записей: {{
-                            Article::wherePublish(1)
-                                ->pluck('author_id')
-                                ->merge(
-                            DB::table('news')
-                                ->wherePublish(1)
-                                ->pluck('author_id'))
-                                ->countBy()
-                                ->sortDesc()
-                                ->first()               
-    }}
-</p>
-<p class="col-12 ">
-    Всего комментариев: {{ Comment::count() }}
+    Всего зарегистрированных пользователей: {{ \App\User::count() }}
 </p>
 @php
-    $entry = App\Entry::where('id',
-        Comment::pluck('entry_id')
+    $mostUserIds = \App\Models\Article::wherePublish(1)
+                    ->pluck('author_id')
+                    ->merge(
+                        \App\News::wherePublish(1)
+                            ->pluck('author_id')
+                    )
+                   ->countBy();
+@endphp
+<p class="col-12 mr-1">
+    - из них опубликовали хотя бы одну запись: {{ $mostUserIds->count() }}
+</p>
+<p class="col-12 ">
+    Самый пишущий автор: {{ \App\User::whereId($mostUserIds->keys()->first())->first()->name }}
+</p>
+<p class="col-12 mr-1">
+    - у него записей: {{ $mostUserIds->first() }}
+</p>
+<p class="col-12 ">
+    Всего комментариев: {{ \App\Comment::count() }}
+</p>
+@php
+    $entry = \App\Entry::where('id',
+        \App\Comment::pluck('entry_id')
             ->countBy()
             ->sortDesc()           
             ->keys()
             ->first()
-    )
-    ->first();
+        )
+        ->first();
     $prefix = ($entry->entryable_type === 'App\News') ? 'news' : 'posts';
 @endphp
 <p class="col-12 ">
@@ -94,8 +64,8 @@ use App\VersionNews;
 </p>
 <p class="col-12 ">
     Самый активный комментатор: {{
-        User::where('id', 
-            Comment::pluck('author_id')
+        \App\User::where('id', 
+            \App\Comment::pluck('author_id')
                 ->countBy()
                 ->sortDesc()
                 ->keys()
@@ -107,16 +77,16 @@ use App\VersionNews;
 </p>
 <p class="col-12 mr-1">
     - у него комментариев: {{
-           Comment::pluck('author_id')
+           \App\Comment::pluck('author_id')
                 ->countBy()
                 ->sortDesc()
                 ->first()     
     }}
 </p>
 @php
-    if (Version::all()->count()) {
-        $article = Article::wherePublish(1)->whereId(
-        Version::pluck('article_id')
+    if (\App\Version::count()) {
+        $article = \App\Models\Article::wherePublish(1)->whereId(
+        \App\Version::pluck('article_id')
             ->countBy()
             ->sortDesc()           
             ->keys()
@@ -135,9 +105,9 @@ use App\VersionNews;
     }
 @endphp  
 @php
-    if (App\VersionNews::all()->count()) {
-        $news = News::wherePublish(1)->whereId(
-            VersionNews::pluck('news_id')
+    if (App\VersionNews::count()) {
+        $news = \App\News::wherePublish(1)->whereId(
+            Version\App\News::pluck('news_id')
                 ->countBy()
                 ->sortDesc()           
                 ->keys()
@@ -156,9 +126,9 @@ use App\VersionNews;
     }
 @endphp  
 <p class="col-12">
-    Тегов на сайте: {{ Tag::count() }}
+    Тегов на сайте: {{ \App\Tag::count() }}
 </p>  
 <p class="col-12 mr-1">
-    - из них используются: {{ Tag::tagsCloud()->count() }}
+    - из них используются: {{ \App\Tag::tagsCloud()->count() }}
 </p>  
 @include ('layouts.footer')
