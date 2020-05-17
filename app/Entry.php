@@ -10,6 +10,7 @@ class Entry extends Model
         'entryable_id',
         'entryable_type',
         'publish',
+        'author_id',
     ];
 
     public function entryable()

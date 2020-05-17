@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateEntriesTable extends Migration
 {
+
     /**
      * Run the migrations.
      *
@@ -16,6 +17,8 @@ class CreateEntriesTable extends Migration
         Schema::create('entries', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('entryable_id');
+            $table->bigInteger('author_id')->unsigned();
+            $table->foreign('author_id')->references('id')->on('users');
             $table->boolean('publish')->nullable();
             $table->string('entryable_type');
             $table->unique(['entryable_id', 'entryable_type']);

@@ -38,7 +38,7 @@ class AdminArticleController extends ArticleController
      */
     public function create()
     {
-        //
+        return redirect('/');
     }
 
     /**
@@ -85,7 +85,7 @@ class AdminArticleController extends ArticleController
      */
     public function edit(ArticleModel $article)
     {
-        //abort_if(\Gate::denies('update', $article), 403);
+        abort_if(!$article->id, 404);
         return view('admin.edit', [
             'article' => $article,
         ]);
@@ -100,6 +100,7 @@ class AdminArticleController extends ArticleController
      */
     public function update(Request $request, ArticleModel $article)
     {
+        abort_if(!$article->id, 404);
         $article = $this->updateFunction($request, $article);
         return redirect("/posts/$article->slug");
     }
@@ -112,6 +113,7 @@ class AdminArticleController extends ArticleController
      */
     public function destroy(ArticleModel $article)
     {
+        abort_if(!$article->id, 404);
         \Mail::to($article->author->email)->send(new ArticleDeleted($article));
         $article->delete();
         flash('Статья успешно удалена', 'warning');

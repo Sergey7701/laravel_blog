@@ -24,111 +24,159 @@
 <p class="col-12">
     Всего зарегистрированных пользователей: {{ \App\User::count() }}
 </p>
-@php
-    $mostUserIds = \App\Models\Article::wherePublish(1)
-                    ->pluck('author_id')
-                    ->merge(
-                        \App\News::wherePublish(1)
-                            ->pluck('author_id')
-                    )
-                   ->countBy();
-@endphp
+<?php
+    //Для примера, что использование App\Entry удобнее
+    //Считаем число авторов
+    $mostUsersCount = App\Entry::wherePublish(1)
+                       ->distinct('author_id')
+                       ->count();
+    //Считаем публикации у самого авторского автора и его имя 
+    $mostUserResult = DB::table('entries')->wherePublish(1)
+                        ->join('users', 'entries.author_id', '=', 'users.id')
+                        ->selectRaw('name, COUNT(*) as count_entries') 
+                        ->groupBy('name')
+                        ->orderBy('count_entries', 'desc')
+                        ->first();
+    //То же самое, но через отдельные таблицы
+    $mostUserResultWithoutEntry = DB::table(
+                                      DB::table(
+                                          DB::table('articles') 
+                                              ->wherePublish(1)
+                                              ->join('users', 'articles.author_id', '=', 'users.id')
+                                              ->selectRaw('name, COUNT(*) as count_entries') 
+                                              ->groupBy('name')
+                                              ->orderBy('count_entries', 'desc')
+                                              ->union(
+                                                  DB::table('news') 
+                                                      ->wherePublish(1)
+                                                      ->join('users', 'news.author_id', '=', 'users.id')
+                                                      ->selectRaw('name, COUNT(*) as count_entries') 
+                                                      ->groupBy('name')
+                                                      ->orderBy('count_entries', 'desc')
+                                                )
+                                      ) 
+                                      ->selectRaw('name, SUM(count_entries) as total_entries')
+                                      ->groupBy('name')    
+                                  );   
+?>
 <p class="col-12 mr-1">
-    - из них опубликовали хотя бы одну запись: {{ $mostUserIds->count() }}
+    - из них опубликовали хотя бы одну запись (Entry): {{ $mostUsersCount }}
+</p>
+<p class="col-12 mr-1">
+    - из них опубликовали хотя бы одну запись: {{ $mostUserResultWithoutEntry->count() }}
 </p>
 <p class="col-12 ">
-    Самый пишущий автор: {{ \App\User::whereId($mostUserIds->keys()->first())->first()->name }}
+    Самый пишущий автор (Entry): {{ $mostUserResult->name }}
+</p>
+<p class="col-12 ">
+    Самый пишущий автор: {{ $mostUserResultWithoutEntry->first()->name }}
 </p>
 <p class="col-12 mr-1">
-    - у него записей: {{ $mostUserIds->first() }}
+    - у него записей (Entry): {{ $mostUserResult->count_entries }}
+</p>
+<p class="col-12 mr-1">
+    - у него записей: {{ $mostUserResultWithoutEntry->first()->total_entries }}
 </p>
 <p class="col-12 ">
     Всего комментариев: {{ \App\Comment::count() }}
 </p>
-@php
-    $entry = \App\Entry::where('id',
-        \App\Comment::pluck('entry_id')
-            ->countBy()
-            ->sortDesc()           
-            ->keys()
-            ->first()
-        )
-        ->first();
+<?php
+    $entry = App\Entry::whereId( 
+                \App\Comment::join('entries', 'comments.entry_id', '=', 'entries.id')
+                    ->wherePublish(1)
+                    ->selectRaw('entry_id, COUNT(*) as count_comments') 
+                    ->groupBy('entry_id')
+                    ->orderBy('count_comments', 'desc')
+                    ->first()
+                    ->entry_id
+                )
+                ->first();
     $prefix = ($entry->entryable_type === 'App\News') ? 'news' : 'posts';
-@endphp
+
+?>
 <p class="col-12 ">
     Самая комментируемая запись: <a href="{{ '/'.$prefix.'/'.$entry->entryable->slug }}">{{ $entry->entryable->header }}</a>
 </p>
 <p class="col-12 mr-1">
     - у неё комментариев: {{ $entry->comments->count() }}</a>
 </p>
+<?php
+    $mostCommentator = DB::table('comments')
+                          ->join('entries', 'comments.entry_id', '=', 'entries.id')
+                          ->wherePublish(1)
+                          ->join('users', 'comments.author_id', '=', 'users.id')
+                          ->selectRaw('name, comments.author_id, COUNT(*) as count_comments') 
+                          ->groupBy('comments.author_id')
+                          ->orderBy('count_comments', 'desc')
+                          ->first();
+?>
 <p class="col-12 ">
-    Самый активный комментатор: {{
-        \App\User::where('id', 
-            \App\Comment::pluck('author_id')
-                ->countBy()
-                ->sortDesc()
-                ->keys()
-                ->first()
-                )
-            ->first()
-            ->name
-    }}
+    Самый активный комментатор: {{ $mostCommentator->name }}
 </p>
 <p class="col-12 mr-1">
-    - у него комментариев: {{
-           \App\Comment::pluck('author_id')
-                ->countBy()
-                ->sortDesc()
-                ->first()     
-    }}
+    - у него комментариев: {{ $mostCommentator->count_comments }}
 </p>
-@php
-    if (\App\Version::count()) {
-        $article = \App\Models\Article::wherePublish(1)->whereId(
-        \App\Version::pluck('article_id')
-            ->countBy()
-            ->sortDesc()           
-            ->keys()
-    )->first()
-@endphp
+<?php
+$article = \App\Version::join('articles', 'versions.article_id', '=', 'articles.id')
+                    ->where('articles.publish', 1)
+                    ->selectRaw('versions.article_id, articles.slug, articles.header, COUNT(*) as version_count')
+                    ->groupBy('versions.article_id')
+                    ->first();
+    if ($article) {     
+?>
         <p class="col-12">
-            Самая часто меняемая статья: <a href="/post/{{ $article->slug }}">{{ $article->header}}</a>
+            Самая часто меняемая статья: <a href="/posts/{{ $article->slug }}">{{ $article->header}}</a>
         </p>
-@php
+<?php
     } else {
-@endphp      
+?>
         <p class="col-12">
             Самая часто меняемая статья: пока статьи не редактировались
         </p>
-@php
+<?php
     }
-@endphp  
-@php
-    if (App\VersionNews::count()) {
+?>
+<?php
+    if (App\VersionNews::count() &&
         $news = \App\News::wherePublish(1)->whereId(
             Version\App\News::pluck('news_id')
                 ->countBy()
                 ->sortDesc()           
                 ->keys()
-        )->first()
-@endphp
+        )->first()) {
+?>
         <p class="col-12">
             Самая часто меняемая новость: <a href="/news/{{ $news->slug }}">{{ $news->header}}</a>
         </p>
-@php
+<?php
     } else {
-@endphp      
+?>
         <p class="col-12">
             Самая часто меняемая новость: пока новости не редактировались
         </p>
-@php
+<?php
     }
-@endphp  
+?>
 <p class="col-12">
     Тегов на сайте: {{ \App\Tag::count() }}
 </p>  
 <p class="col-12 mr-1">
-    - из них используются: {{ \App\Tag::tagsCloud()->count() }}
+    - из них используются в опубликованных записях и черновиках: {{ 
+        \App\Tag::whereHas('articles')->get()
+               ->merge(
+                    \App\Tag::whereHas('news')->get()
+                )->count() }}
+</p>  
+<p class="col-12 mr-1">
+    - из них используются только в опубликованных записях: {{ 
+   \App\Tag::whereHas('articles', function ($query) {
+                   return $query->wherePublish(1);
+                })->get()
+               ->merge(
+                    \App\Tag::whereHas('news', function ($query) {
+                       return $query->wherePublish(1);
+                    })->get()
+                )->count()
+    }}
 </p>  
 @include ('layouts.footer')

@@ -34,6 +34,7 @@ class Article extends Entry
         parent::boot();
         static::created(function($entryable) {
             Entry::create([
+                'author_id'      => $entryable->author_id,
                 'entryable_id'   => $entryable->id,
                 'entryable_type' => static::class,
                 'publish'        => $entryable->publish,
@@ -100,6 +101,7 @@ class Article extends Entry
     {
         return $this->morphOne(Entry::class, 'entryable');
     }
+
     public function comments()
     {
         return $this->entry->comments();

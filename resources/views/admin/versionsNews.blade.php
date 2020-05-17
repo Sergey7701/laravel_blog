@@ -32,7 +32,7 @@
         @else
             <p class="blog-post-text text-secondary">Заголовок не менялся</p>
         @endif
-        @if ($version->tags !== $version->old_tags)   
+        @if ((string) $version->tags !== (string) $version->old_tags)   
             <p class="blog-post-text text-info">Теги:</p>
             <p class="blog-post-text text-primary">
                 <span class="bg-info text-white mr-1"> Стало: </span> 
