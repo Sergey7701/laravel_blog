@@ -44,17 +44,17 @@ class User extends Authenticatable
 
     public function articles()
     {
-        return $this->hasMany(Article::class, 'author_id')->wherePublish(1);
+        return $this->hasMany(Article::class, 'author_id');
     }
 
     public function news()
     {
-        return $this->hasMany(News::class, 'author_id')->wherePublish(1);
+        return $this->hasMany(News::class, 'author_id');
     }
 
     public function entries()
     {
-        return $this->hasMany(Entry::class, 'author_id')->wherePublish(1);
+        return $this->hasMany(Entry::class, 'author_id');
     }
 
     public function comments()
