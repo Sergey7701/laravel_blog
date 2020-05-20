@@ -19,7 +19,7 @@ class NewsController extends Controller
         ]);
     }
 
-    public function index($param)
+    public function index()
     {
         return redirect('/');
     }

@@ -82,11 +82,6 @@ class Article extends Entry
         return 'slug';
     }
 
-    public function author()
-    {
-        return $this->belongsTo(User::class);
-    }
-
     public function tags()
     {
         return $this->morphToMany(Tag::class, 'taggable');
