@@ -111,11 +111,13 @@ class StatisticController extends Controller
                 ->orderByDesc('comments_count')
                 ->first()
             ->comments_count,
-            'mostCommentatorWithDraftes'      => User::withCount('comments')
+            'mostCommentatorWithDraftes'      => User::has('comments')
+                ->withCount('comments')
                 ->orderByDesc('comments_count')
                 ->first()
             ->name,
-            'mostCommentatorWithDraftesCount' => User::withCount('comments')
+            'mostCommentatorWithDraftesCount' => User::has('comments')
+                ->withCount('comments')
                 ->orderByDesc('comments_count')
                 ->first()
             ->comments_count,
