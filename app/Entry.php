@@ -17,9 +17,6 @@ class Entry extends Model
     protected static function boot()
     {
         parent::boot();
-        static::addGlobalScope('publish', function (Builder $builder) {
-            $builder->wherePublish(1);
-        });
     }
 
     public function entryable()

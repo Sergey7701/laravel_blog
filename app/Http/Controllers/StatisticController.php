@@ -1,12 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Comment;
-use App\Entry;
-use App\Models\Article;
-use App\News;
-use App\Tag;
-use App\User;
+use Illuminate\Http\Request;
 use DB;
 
 class StatisticController extends Controller
@@ -29,15 +24,19 @@ class StatisticController extends Controller
     private function part1()
     {
         return [
-            'countPublishedEntries'  => Entry::count(),
-            'countPublishedArticles' => Entry::whereEntryableType(Article::class)
+            'countPublishedEntries'  => \App\Entry::wherePublish(1)->count(),
+            'countPublishedArticles' => \App\Entry::whereEntryableType(\App\Models\Article::class)
+                ->wherePublish(1)
                 ->count(),
-            'countPublishedNews'     => Entry::whereEntryableType(News::class)
+            'countPublishedNews'     => \App\Entry::whereEntryableType(\App\News::class)
+                ->wherePublish(1)
                 ->count(),
-            'maxLengthTextOfArticle' => Article::selectRaw('MAX(LENGTH(`text`)) as max_length')
+            'maxLengthTextOfArticle' => \App\Models\Article::wherePublish(1)
+                ->selectRaw('MAX(LENGTH(`text`)) as max_length')
                 ->first()
             ->max_length,
-            'maxLengthTextOfNews'    => News::selectRaw('MAX(LENGTH(`text`)) as max_length')
+            'maxLengthTextOfNews'    => \App\News::wherePublish(1)
+                ->selectRaw('MAX(LENGTH(`text`)) as max_length')
                 ->first()
             ->max_length,
         ];
@@ -46,17 +45,21 @@ class StatisticController extends Controller
     private function part2()
     {
         return [
-            'minLengthTextOfArticle'    => Article::selectRaw('MIN(LENGTH(`text`)) as min_length')
+            'minLengthTextOfArticle'    => \App\Models\Article::wherePublish(1)
+                ->selectRaw('MIN(LENGTH(`text`)) as min_length')
                 ->first()
             ->min_length,
-            'minLengthTextOfNews'       => News::selectRaw('MIN(LENGTH(`text`)) as min_length')
+            'minLengthTextOfNews'       => \App\News::wherePublish(1)
+                ->selectRaw('MIN(LENGTH(`text`)) as min_length')
                 ->first()
             ->min_length,
-            'countUsers'                => User::count(),
-            'mostUsersCount'            => Entry::distinct('author_id')->count(),
-            'mostUserWithoutEntryCount' => Article::select('author_id')
+            'countUsers'                => \App\User::count(),
+            'mostUsersCount'            => \App\Entry::wherePublish(1)->distinct('author_id')->count(),
+            'mostUserWithoutEntryCount' => \App\Models\Article::wherePublish(1)
+                ->select('author_id')
                 ->union(
-                    News::select('author_id')
+                    \App\News::wherePublish(1)
+                    ->select('author_id')
                 )
                 ->count(),
         ];
@@ -65,20 +68,35 @@ class StatisticController extends Controller
     private function part3()
     {
         return [
-            'mostUser'                   => User::withCount('entries')
+            'mostUser' => \App\User::withCount(['entries' => function($q) {
+                        $q->wherePublish(1);
+                    }])
                 ->orderByDesc('entries_count')
                 ->first()
             ->name,
-            'mostUserWithoutEntry'       => DB::table(User::withCount('news', 'articles'))
+            'mostUserWithoutEntry' => DB::table(\App\User::withCount(['news' => function($q) {
+                            $q->wherePublish(1);
+                        },
+                        'articles'             => function($q1) {
+                            $q1->wherePublish(1);
+                        }
+                ]))
                 ->selectRaw('name, news_count + articles_count as total_count')
                 ->orderByDesc('total_count')
                 ->first()
             ->name,
-            'mostUserResult'             => User::withCount('entries')
+            'mostUserResult' => \App\User::withCount(['entries' => function ($q) {
+                        $q->wherePublish(1);
+                    }])
                 ->orderByDesc('entries_count')
                 ->first()
             ->entries_count,
-            'mostUserResultWithoutEntry' => DB::table(User::withCount('news', 'articles'))
+            'mostUserResultWithoutEntry' => DB::table(\App\User::withCount(['news' => function ($q) {
+                            $q->wherePublish(1);
+                        },
+                        'articles'                   => function ($q) {
+                            $q->wherePublish(1);
+                        }]))
                 ->selectRaw('name, news_count + articles_count as total_count')
                 ->orderByDesc('total_count')
                 ->first()
@@ -89,12 +107,15 @@ class StatisticController extends Controller
     private function part4()
     {
         return [
-            'countComments'   => Comment::count(),
-            'entry'           => Entry::withCount('comments')
+            'countComments'   => \App\Comment::count(),
+            'entry'           => \App\Entry::withCount('comments')
+                ->wherePublish(1)
                 ->orderByDesc('comments_count')
                 ->first(),
-            'mostCommentator' => User::withCount(['comments' => function($q) {
-                        $q->whereHas('entry');
+            'mostCommentator' => \App\User::withCount(['comments' => function($q) {
+                        $q->whereHas('entry', function ($q1) {
+                                $q1->wherePublish(1);
+                            });
                     }])
                 ->orderByDesc('comments_count')
                 ->first()
@@ -105,19 +126,19 @@ class StatisticController extends Controller
     private function part5()
     {
         return [
-            'mostCommentatorCount' => User::withCount(['comments' => function($q) {
-                        $q->whereHas('entry');
+            'mostCommentatorCount' => \App\User::withCount(['comments' => function($q) {
+                        $q->whereHas('entry', function ($q1) {
+                                $q1->wherePublish(1);
+                            });
                     }])
                 ->orderByDesc('comments_count')
                 ->first()
             ->comments_count,
-            'mostCommentatorWithDraftes'      => User::has('comments')
-                ->withCount('comments')
+            'mostCommentatorWithDraftes'      => \App\User::withCount('comments')
                 ->orderByDesc('comments_count')
                 ->first()
             ->name,
-            'mostCommentatorWithDraftesCount' => User::has('comments')
-                ->withCount('comments')
+            'mostCommentatorWithDraftesCount' => \App\User::withCount('comments')
                 ->orderByDesc('comments_count')
                 ->first()
             ->comments_count,
@@ -127,19 +148,17 @@ class StatisticController extends Controller
     private function part6()
     {
         return [
-            'mostEditingArticle' => Article::withCount('versions')
+            'mostEditingArticle' => \App\Models\Article::wherePublish(1)
+                ->withCount('versions')
                 ->orderByDesc('versions_count')
                 ->first(),
-            'mostEditingNews'    => News::withCount('versions')
+            'mostEditingNews'    => \App\News::wherePublish(1)
+                ->withCount('versions')
                 ->orderByDesc('versions_count')
                 ->first(),
-            'tagsCount'          => Tag::count(),
-            'usedTagsCount'      => DB::table(Tag::withCount(['articles' => function($q) {
-                            $q->withoutGlobalScope('publish');
-                        }])
-                    ->withCount(['news' => function ($q) {
-                            $q->withoutGlobalScope('publish');
-                        }]))
+            'tagsCount'          => \App\Tag::count(),
+            'usedTagsCount'      => DB::table(\App\Tag::withCount('articles')
+                    ->withCount('news'))
                 ->where('articles_count', '>', 0)
                 ->orWhere('news_count', '>', 0)
                 ->count(),
@@ -149,8 +168,12 @@ class StatisticController extends Controller
     private function part7()
     {
         return [
-            'usedTagsPublishedCount' => DB::table(Tag::withCount('articles')
-                    ->withCount('news'))
+            'usedTagsPublishedCount' => DB::table(\App\Tag::withCount(['articles' => function($q) {
+                            $q->wherePublish(1);
+                        }])
+                    ->withCount(['news' => function ($q) {
+                            $q->wherePublish(1);
+                        }]))
                 ->where('articles_count', '>', 0)
                 ->orWhere('news_count', '>', 0)
                 ->count(),

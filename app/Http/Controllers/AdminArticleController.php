@@ -26,8 +26,9 @@ class AdminArticleController extends ArticleController
     public function index()
     {
         session(['admin' => true]);
+        //dd(Entry::latest()->withoutGlobalScope('publish')->paginate(10));
         return view('admin.welcome', [
-            'entries' => Entry::latest()->paginate(10),
+            'entries' => Entry::latest()->withoutGlobalScope('publish')->paginate(10),
         ]);
     }
 

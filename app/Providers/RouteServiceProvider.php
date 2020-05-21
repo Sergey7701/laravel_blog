@@ -32,8 +32,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
-
         parent::boot();
         Route::bind('post', function($slug) {
             if (!\auth()->check() || !\auth()->user()->hasRole('administrator', 'editor')) {
