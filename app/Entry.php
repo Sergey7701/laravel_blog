@@ -2,6 +2,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Entry extends Model
 {
@@ -10,7 +11,16 @@ class Entry extends Model
         'entryable_id',
         'entryable_type',
         'publish',
+        'author_id',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::addGlobalScope('publish', function (Builder $builder) {
+            $builder->wherePublish(1);
+        });
+    }
 
     public function entryable()
     {
@@ -20,5 +30,10 @@ class Entry extends Model
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+
+    public function author()
+    {
+        return $this->belongsTo(User::class);
     }
 }

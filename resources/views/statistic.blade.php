@@ -1,91 +1,54 @@
-<?php
-
-use App\Models\Article;
-use App\News;
-use App\Tag;
-use App\Entry;
-use App\User;
-use App\Comment;
-use App\Version;
-use App\VersionNews;
-
-?>
 @include ('layouts.header', ['title' => 'Статистика сайта'])
 <h3>Статистика сайта:</h3>
 <p class="col-12">
-    Всего опубликованных записей: {{ Entry::wherePublish(1)->count() }}
+    Всего опубликованных записей: {{ $countPublishedEntries }}
 </p>
 <p class="col-12 mr-1">
-    - из них статей: {{ Entry::wherePublish(1)->whereEntryableType(Article::class)->count() }}
+    - из них статей: {{ $countPublishedArticles }}
 </p>
 <p class="col-12 mr-1">
-    - из них новостей: {{ Entry::wherePublish(1)->whereEntryableType(News::class)->count() }}
+    - из них новостей: {{ $countPublishedNews }}
 </p>
 <p class="col-12">
-    Самый длинный текст у статьи: {{ Article::selectRaw('max(length(`text`)) ')->pluck("max(length(`text`))")->toArray()[0] }}
+    Самый длинный текст у статьи: {{ $maxLengthTextOfArticle }}
+</p>
+<p class="col-12">
+    Самый длинный текст у новости: {{ $maxLengthTextOfNews }} 
+</p>
+<p class="col-12">
+    Самый короткий текст у статьи: {{ $minLengthTextOfArticle }}
 </p>    
 <p class="col-12">
-    Самый длинный текст у новости: {{ News::selectRaw(' max(length(`text`)) ')->pluck("max(length(`text`))")->toArray()[0] }} 
+    Самый короткий текст у новости: {{ $minLengthTextOfNews }} 
 </p>
 <p class="col-12">
-    Самый короткий текст у статьи: {{ Article::selectRaw(' min(length(`text`)) ')->pluck("min(length(`text`))")->toArray()[0] }}
-</p>    
-<p class="col-12">
-    Самый короткий текст у новости: {{ News::selectRaw(' min(length(`text`)) ')->pluck("min(length(`text`))")->toArray()[0] }} 
-</p>
-<p class="col-12">
-    Всего зарегистрированных пользователей: {{ User::count() }}
+    Всего зарегистрированных пользователей: {{ $countUsers }}
 </p>
 <p class="col-12 mr-1">
-    - из них опубликовали хотя бы одну запись: {{ User::whereIn('id', 
-            array_merge(
-                DB::table('news')->wherePublish(1)->pluck('author_id')->toArray(), 
-                DB::table('articles')->wherePublish(1)->pluck('author_id')->toArray()
-            )
-        )->count() }}
-</p>
-<p class="col-12 ">
-    Самый пишущий автор: {{ User::where('id', 
-                            DB::table('articles')
-                                ->wherePublish(1)
-                                ->pluck('author_id')
-                                ->merge(
-                            DB::table('news')
-                                ->wherePublish(1)
-                                ->pluck('author_id'))
-                                ->countBy()
-                                ->sortDesc()
-                                ->keys()
-                                ->first()
-                )->first()->name }}
+    - из них опубликовали хотя бы одну запись (Entry): {{ $mostUsersCount }}
 </p>
 <p class="col-12 mr-1">
-    - у него записей: {{
-                            Article::wherePublish(1)
-                                ->pluck('author_id')
-                                ->merge(
-                            DB::table('news')
-                                ->wherePublish(1)
-                                ->pluck('author_id'))
-                                ->countBy()
-                                ->sortDesc()
-                                ->first()               
-    }}
+    - из них опубликовали хотя бы одну запись: {{ $mostUserWithoutEntryCount}}
 </p>
 <p class="col-12 ">
-    Всего комментариев: {{ Comment::count() }}
+    Самый пишущий автор (Entry): {{ $mostUser }}
 </p>
-@php
-    $entry = App\Entry::where('id',
-        Comment::pluck('entry_id')
-            ->countBy()
-            ->sortDesc()           
-            ->keys()
-            ->first()
-    )
-    ->first();
-    $prefix = ($entry->entryable_type === 'App\News') ? 'news' : 'posts';
-@endphp
+<p class="col-12 ">
+    Самый пишущий автор: {{ $mostUserWithoutEntry }}
+</p>
+<p class="col-12 mr-1">
+    - у него записей (Entry): {{ $mostUserResult }}
+</p>
+<p class="col-12 mr-1">
+    - у него записей: {{ $mostUserResultWithoutEntry }}
+</p>
+<p class="col-12 ">
+    Всего комментариев: {{ $countComments }}
+</p>
+<?php
+$prefix = ($entry->entryable_type === 'App\News') ? 'news' : 'posts';
+
+?>
 <p class="col-12 ">
     Самая комментируемая запись: <a href="{{ '/'.$prefix.'/'.$entry->entryable->slug }}">{{ $entry->entryable->header }}</a>
 </p>
@@ -93,72 +56,60 @@ use App\VersionNews;
     - у неё комментариев: {{ $entry->comments->count() }}</a>
 </p>
 <p class="col-12 ">
-    Самый активный комментатор: {{
-        User::where('id', 
-            Comment::pluck('author_id')
-                ->countBy()
-                ->sortDesc()
-                ->keys()
-                ->first()
-                )
-            ->first()
-            ->name
-    }}
+    Самый активный комментатор, без черновиков: {{ $mostCommentator }}
 </p>
 <p class="col-12 mr-1">
-    - у него комментариев: {{
-           Comment::pluck('author_id')
-                ->countBy()
-                ->sortDesc()
-                ->first()     
-    }}
+    - у него комментариев: {{ $mostCommentatorCount }}
 </p>
-@php
-    if (Version::all()->count()) {
-        $article = Article::wherePublish(1)->whereId(
-        Version::pluck('article_id')
-            ->countBy()
-            ->sortDesc()           
-            ->keys()
-    )->first()
-@endphp
-        <p class="col-12">
-            Самая часто меняемая статья: <a href="/post/{{ $article->slug }}">{{ $article->header}}</a>
-        </p>
-@php
-    } else {
-@endphp      
-        <p class="col-12">
-            Самая часто меняемая статья: пока статьи не редактировались
-        </p>
-@php
-    }
-@endphp  
-@php
-    if (App\VersionNews::all()->count()) {
-        $news = News::wherePublish(1)->whereId(
-            VersionNews::pluck('news_id')
-                ->countBy()
-                ->sortDesc()           
-                ->keys()
-        )->first()
-@endphp
-        <p class="col-12">
-            Самая часто меняемая новость: <a href="/news/{{ $news->slug }}">{{ $news->header}}</a>
-        </p>
-@php
-    } else {
-@endphp      
-        <p class="col-12">
-            Самая часто меняемая новость: пока новости не редактировались
-        </p>
-@php
-    }
-@endphp  
+<p class="col-12 ">
+    Самый активный комментатор, включая черновики: {{ $mostCommentatorWithDraftes }}
+</p>
+<p class="col-12 mr-1">
+    - у него комментариев: {{ $mostCommentatorWithDraftesCount }}
+</p>
+<?php
+if ($mostEditingArticle) {
+
+    ?>
+    <p class="col-12">
+        Самая часто меняемая статья: <a href="/posts/{{ $mostEditingArticle->slug }}">{{ $mostEditingArticle->header}}</a>
+    </p>
+    <?php
+} else {
+
+    ?>
+    <p class="col-12">
+        Самая часто меняемая статья: пока статьи не редактировались
+    </p>
+    <?php
+}
+
+?>
+<?php
+if ($mostEditingNews) {
+
+    ?>
+    <p class="col-12">
+        Самая часто меняемая новость: <a href="/news/{{ $mostEditingNews->slug }}">{{ $mostEditingNews->header}}</a>
+    </p>
+    <?php
+} else {
+
+    ?>
+    <p class="col-12">
+        Самая часто меняемая новость: пока новости не редактировались
+    </p>
+    <?php
+}
+
+?>
 <p class="col-12">
-    Тегов на сайте: {{ Tag::count() }}
+    Тегов на сайте: {{ $tagsCount }}
 </p>  
 <p class="col-12 mr-1">
-    - из них используются: {{ Tag::tagsCloud()->count() }}
+    - из них используются в опубликованных записях и черновиках: {{ $usedTagsCount }}
+</p>  
+<p class="col-12 mr-1">
+    - из них используются только в опубликованных записях: {{ $usedTagsPublishedCount  }}
 </p>  
 @include ('layouts.footer')

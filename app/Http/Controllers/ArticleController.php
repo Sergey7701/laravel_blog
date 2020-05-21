@@ -80,6 +80,7 @@ class ArticleController extends Controller
      */
     public function show(ArticleModel $article)
     {
+        abort_if(!$article->id, 404);
         return view('show', [
             'article'  => $article,
             'comments' => $article->comments()->orderByDesc('created_at')->paginate(10),
@@ -95,6 +96,7 @@ class ArticleController extends Controller
     public function edit(ArticleModel $article)
     {
         abort_if(\Gate::denies('update', $article), 403);
+        abort_if(!$article->id, 404);
         return view('edit', [
             'article' => $article,
         ]);
@@ -110,6 +112,7 @@ class ArticleController extends Controller
     public function update(Request $request, ArticleModel $article)
     {
         abort_if(Auth()->user()->cannot('update', $article), 403);
+        abort_if(!$article->id, 404);
         $article = $this->updateFunction($request, $article);
         return redirect("/posts/$article->slug");
     }
@@ -123,6 +126,7 @@ class ArticleController extends Controller
     public function destroy(ArticleModel $article)
     {
         abort_if(Auth()->user()->cannot('update', $article), 403);
+        abort_if(!$article->id, 404);
         \Mail::to($article->author->email)->send(new ArticleDeleted($article));
         $article->delete();
         flash('Статья успешно удалена', 'warning');

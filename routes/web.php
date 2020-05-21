@@ -23,14 +23,11 @@ Route::get('/about', function () {
     session(['admin' => false]);
     return view('about');
 });
-Route::get('/contacts', function () {
+Route::get('/contacts', function() {
     session(['admin' => false]);
     return view('contacts');
 });
-Route::get('/statistic', function () {
-    session(['admin' => false]);
-    return view('statistic');
-});
+Route::get('/statistic', 'StatisticController@index');
 Route::resource('/news', 'NewsController');
 Route::resource('/news/{entry}/comment', 'CommentController');
 Route::resource('/posts/{entry}/comment', 'CommentController');
@@ -40,7 +37,7 @@ Route::group(['middleware' => 'permission:manage-articles'], function() {
     Route::resource('/admin/posts', 'AdminArticleController');
     Route::get('/admin/posts/{post}/versions', 'VersionController@indexArticles');
     Route::get('/admin/news/{news}/versions', 'VersionController@indexNews');
-    Route::get('/admin', function (){
+    Route::get('/admin', function () {
         session(['admin' => true]);
         return redirect('/admin/posts');
     });
