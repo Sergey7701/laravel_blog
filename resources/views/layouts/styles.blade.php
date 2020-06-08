@@ -37,3 +37,4 @@
         <!-- Custom styles for this template -->
         <link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900" rel="stylesheet">
         <link rel="stylesheet" href="{{ URL::asset ('/css/app.css') }}">
+        <script src="{{ URL::asset ('/js/app.js') }}" defer></script>

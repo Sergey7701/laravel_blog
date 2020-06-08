@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->command('horizon:snapshot')->hourly();
         $schedule->command('app:NewsletterAboutNewArticles 7')->mondays()->at('13:12');
     }
 

@@ -3,6 +3,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Notifications\NewsletterAboutNewArticles as NewsLetter;
+use Carbon\Carbon;
 
 class NewsletterAboutNewArticles extends Command
 {
@@ -20,6 +21,7 @@ class NewsletterAboutNewArticles extends Command
      * @var string
      */
     protected $description = 'Рассылка уведомлений пользователям о новых статьях';
+    private $entries;
 
     /**
      * Create a new command instance.
@@ -38,9 +40,9 @@ class NewsletterAboutNewArticles extends Command
      */
     public function handle()
     {
-        $articles  = \App\Models\Article::where('created_at', '>', (new Carbon)->subDays($this->argument('interval')))->get();
+        $this->entries = \App\Entry::where('created_at', '>', (new Carbon)->subDays($this->argument('interval')))->wherePublish(1)->get();
         \App\User::all()->map(function($user) {
-            $user->notify(new NewsLetter($articles));
+            $user->notify(new NewsLetter($this->entries));
         });
     }
 }

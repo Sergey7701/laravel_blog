@@ -32,8 +32,11 @@ class ArticleController extends Controller
     {
         session(['admin' => false]);
         return view('welcome', [
-            'entries' => Entry::with('entryable')->latest()->where('publish', true)->paginate(10),
-            //'articles' => ArticleModel::with('tags')->where('publish', true)->latest()->paginate(10),
+            'entries' => Entry::with('entryable')
+                ->where('publish', true)
+                ->orWhere('author_id', auth()->id())
+                ->latest()
+                ->paginate(10),
         ]);
     }
 
@@ -67,7 +70,6 @@ class ArticleController extends Controller
                 //'publish'   => isset($data['publish']) ? 1 : null,
                 'author_id' => Auth::id(),
         ]));
-        event(new ArticleCreated($article));
         flash('Статья успешно создана');
         return redirect('/');
     }

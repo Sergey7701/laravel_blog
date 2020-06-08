@@ -9,7 +9,7 @@ class StatisticController extends Controller
 
     public function index()
     {
-        return view('statistic', array_merge(
+        return array_merge(
                 $this->part1(),
                 $this->part2(),
                 $this->part3(),
@@ -17,8 +17,7 @@ class StatisticController extends Controller
                 $this->part5(),
                 $this->part6(),
                 $this->part7(),
-            )
-        );
+            );
     }
 
     private function part1()
@@ -149,10 +148,12 @@ class StatisticController extends Controller
     {
         return [
             'mostEditingArticle' => \App\Models\Article::wherePublish(1)
+                ->has('versions')
                 ->withCount('versions')
                 ->orderByDesc('versions_count')
                 ->first(),
             'mostEditingNews'    => \App\News::wherePublish(1)
+                ->has('versions')
                 ->withCount('versions')
                 ->orderByDesc('versions_count')
                 ->first(),

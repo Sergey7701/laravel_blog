@@ -2,8 +2,9 @@
 namespace App\Models;
 
 use App\Entry;
+use App\Events\ArticleCreated;
+use App\Events\ArticleUpdated;
 use App\Tag;
-use App\User;
 use App\Version;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,8 +16,8 @@ class Article extends Entry
     use Sluggable;
     use SoftDeletes;
 
-    protected $dates    = ['deleted_at'];
-    protected $fillable = [
+    protected $dates            = ['deleted_at'];
+    protected $fillable         = [
         'header',
         'description',
         'text',
@@ -25,9 +26,10 @@ class Article extends Entry
         'newTags',
         'oldTags',
     ];
-    protected $casts    = [
+    protected $casts            = [
         'publish' => 'boolean',
     ];
+    protected static $urlPrefix = 'posts';
 
     protected static function boot()
     {
@@ -39,6 +41,7 @@ class Article extends Entry
                 'entryable_type' => static::class,
                 'publish'        => $entryable->publish,
             ]);
+            event(new ArticleCreated($article));
         });
         static::updating(function($article) {
             get_class($article)::makeVersion($article);
@@ -102,6 +105,11 @@ class Article extends Entry
         return $this->entry->comments();
     }
 
+    public static function getUrlPrefix()
+    {
+        return static::$urlPrefix;
+    }
+
     private static function makeVersion($article)
     {
         $newTags = $article->newTags;
@@ -116,6 +124,7 @@ class Article extends Entry
                 'publish'     => $article->publish,
                 'tags'        => $newTags,
                 'old_tags'    => $oldTags,
+                'prefix'      => 'posts',
         ]);
     }
 }

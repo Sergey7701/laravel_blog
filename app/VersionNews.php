@@ -1,10 +1,12 @@
 <?php
 namespace App;
 
+use App\News;
+
 class VersionNews extends Version
 {
 
-    protected $fillable = [
+    protected $fillable         = [
         'news_id',
         'editor_id',
         'tags',
@@ -13,6 +15,7 @@ class VersionNews extends Version
         'text',
         'publish',
     ];
+    protected static $baseModel = News::class;
 
     public function news()
     {

@@ -1,4 +1,8 @@
 <?php
+
+use App\Models\Article;
+use App\News;
+
 if (!function_exists('flash')) {
 
     /**
@@ -10,6 +14,18 @@ if (!function_exists('flash')) {
     {
         session()->flash('message', $message);
         session()->flash('message_type', $type);
+    }
+}
+if (!function_exists('getUrlPrefix')) {
+
+    function getUrlPrefix(string $modelType)
+    {
+        switch ($modelType) {
+            case Article::class:
+                return 'posts';
+            case News::class:
+                return 'news';
+        }
     }
 }
 

@@ -3,6 +3,8 @@ namespace App;
 
 use App\Models\Article;
 use Illuminate\Database\Eloquent\Model;
+use App\Events\ArticleUpdated;
+use \Cviebrock\EloquentSluggable\Services\SlugService;
 
 class Version extends Model
 {
@@ -17,6 +19,18 @@ class Version extends Model
         'text',
         'publish',
     ];
+    protected static $baseModel = Article::class;
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::created(function($version) {
+            $version->prefix = static::getUrlPrefix();
+            $version->slug   = static::getSlug($version->header);
+            broadcast(new ArticleUpdated($version))->toOthers();
+            unset($version->prefix, $version->slug);
+        });
+    }
 
     public function article()
     {
@@ -55,5 +69,15 @@ class Version extends Model
     {
         $this->attributes['publish']     = $newValue ? 1 : 0;
         $this->attributes['old_publish'] = $this->recentArticle()->publish;
+    }
+
+    protected static function getUrlPrefix()
+    {
+        return (static::$baseModel)::getUrlPrefix();
+    }
+
+    public static function getSlug($source)
+    {
+        return SlugService::createSlug(static::$baseModel, 'slug', $source);
     }
 }
