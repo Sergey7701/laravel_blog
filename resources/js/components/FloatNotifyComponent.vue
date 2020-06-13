@@ -29,21 +29,23 @@
         mounted() {			
 			let reason = {};
 			Echo.private('editor-notify').listen('ArticleUpdated',  e => {
-				switch (e.reason.service.prefix) {
-					case 'posts': 
-						reason.message = 'В статье изменилось: ';
-						break;
-					case 'news':	
-						reason.message = 'В новости изменилось: ';
-						break;
-				}
-				for (let key in e.reason.data){
-					reason.message +=  key + ' ';
-				}
-				reason.prefix = e.reason.service.prefix;
-				reason.slug = e.reason.service.slug;
-				reason.header = e.reason.service.header;
-				Vue.set(this.reasons, this.reasons.length, {...reason})
+				if (e.service.editor_id !== userId){
+					switch (e.reason.service.prefix) {
+						case 'posts': 
+							reason.message = 'В статье изменилось: ';
+							break;
+						case 'news':	 
+							reason.message = 'В новости изменилось: ';
+							break;
+					}
+					for (let key in e.reason.data){
+						reason.message +=  key + ' ';
+					}
+					reason.prefix = e.reason.service.prefix;
+					reason.slug = e.reason.service.slug;
+					reason.header = e.reason.service.header;
+					Vue.set(this.reasons, this.reasons.length, {...reason})
+				}	
 	        });
 		}
 	}

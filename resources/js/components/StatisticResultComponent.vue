@@ -18,13 +18,10 @@
     export default {
 		data(){
 			return {
-				statistic: [
-					
-				]
+				statistic: []
 			}	
 		},
         mounted() {
-			console.log(`personal-channel-user-${ userId }`);
 			Echo.private(`personal-channel-user-${ userId }`).listen('StatisticReport', e => {
 console.log(e);
 				this.statistic.push(e.statistic);

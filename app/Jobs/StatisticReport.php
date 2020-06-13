@@ -2,7 +2,6 @@
 namespace App\Jobs;
 
 use App\Events\StatisticReport as StatisticReportCast;
-use App\Helpers\StatisticGenerator;
 use App\Notifications\StatisticReport as StatisticMail;
 use App\User;
 use Illuminate\Bus\Queueable;
@@ -10,8 +9,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-
-;
 
 class StatisticReport implements ShouldQueue
 {
@@ -30,7 +27,7 @@ class StatisticReport implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(int $userId, array $statistic, string $statisticGenerator)
+    public function __construct(User $userId, array $statistic, string $statisticGenerator)
     {
         $this->userId             = $userId;
         $this->statistic          = $statistic;

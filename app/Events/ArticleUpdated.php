@@ -31,9 +31,10 @@ class ArticleUpdated extends ArticleCreated
             }
         }
         $this->reason['service'] = [
-            'prefix' => $version->prefix,
-            'slug'   => $version->slug,
-            'header' => $version->header,
+            'prefix'    => $version->prefix,
+            'slug'      => $version->slug,
+            'header'    => $version->header,
+            'editor_id' => $version->editor_id,
         ];
     }
 
