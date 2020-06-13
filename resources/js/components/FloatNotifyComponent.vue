@@ -29,7 +29,7 @@
         mounted() {			
 			let reason = {};
 			Echo.private('editor-notify').listen('ArticleUpdated',  e => {
-				if (e.service.editor_id !== userId){
+				if (e.reason.service.editor_id !== userId){
 					switch (e.reason.service.prefix) {
 						case 'posts': 
 							reason.message = 'В статье изменилось: ';

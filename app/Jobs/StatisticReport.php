@@ -27,7 +27,7 @@ class StatisticReport implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(User $userId, array $statistic, string $statisticGenerator)
+    public function __construct(int $userId, array $statistic, string $statisticGenerator)
     {
         $this->userId             = $userId;
         $this->statistic          = $statistic;

@@ -91,7 +91,7 @@ class AdminReportController extends Controller
                 $result[$key] = $this->statisticFormSkeleton[$key];
             }
         }
-        StatisticReport::dispatch(\App\User::find(Auth::id()), $this->insertTextIntoSkeleton($result), StatisticGenerator::class)
+        StatisticReport::dispatch(Auth::id(), $this->insertTextIntoSkeleton($result), StatisticGenerator::class)
             ->onQueue('reports')
             ->delay(now()->addSeconds(20));
         return redirect('/admin/report');
