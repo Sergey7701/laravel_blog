@@ -22,7 +22,6 @@ class AdminReportController extends Controller
      *  Названия подпунктов хранятся в lang/ru/statisticReport.php
      *  Для их получения использовать \App::setLocale('ru');
      */
-    
     protected $statisticFormSkeleton = [
         'countPublishedEntries'      => [
             'countPublishedEntries'  => [],
@@ -80,21 +79,34 @@ class AdminReportController extends Controller
     public function showForm()
     {
         return view('/admin/statisticReport', [
-            'skeleton' => $this->statisticFormSkeleton,
+            'skeleton' => $this->insertTextIntoSkeleton($this->statisticFormSkeleton),
         ]);
     }
 
     public function makeReport(Request $request)
     {
-        $result    = [];
+        $result = [];
         foreach ($request->all() as $key => $val) {
             if (key_exists($key, $this->statisticFormSkeleton)) {
                 $result[$key] = $this->statisticFormSkeleton[$key];
             }
         }
-        StatisticReport::dispatch(Auth::id(), $result, new StatisticGenerator)
+        StatisticReport::dispatch(Auth::id(), $this->insertTextIntoSkeleton($result), StatisticGenerator::class)
             ->onQueue('reports')
             ->delay(now()->addSeconds(20));
         return redirect('/admin/report');
+    }
+
+    private function insertTextIntoSkeleton($skeleton)
+    {
+        //Вставляем текст в заготовку отчёта.
+        \App::setLocale('ru');
+        $formText = [];
+        foreach ($skeleton as $key => $val) {
+            foreach ($val as $func => $unused) {
+                $formText[$key][__('statisticReport.' . $func)] = $func;
+            }
+        }
+        return $formText;
     }
 }
