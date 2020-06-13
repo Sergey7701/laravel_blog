@@ -18,10 +18,7 @@ class Entry extends Model
     protected static function boot()
     {
         parent::boot();
-        if ((!empty(Route::current()) && in_array(Route::current()->uri, [
-                'admin/report',
-                'statistic',
-            ])) || session('use scopePublish')) {
+        if (session('use scopePublish')) {
             static::addGlobalScope('publish', function (Builder $builder) {
                 $builder->wherePublish(1);
             });

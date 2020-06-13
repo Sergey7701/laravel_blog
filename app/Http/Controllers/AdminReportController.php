@@ -1,10 +1,10 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Helpers\HelperStatistic;
 use App\Jobs\StatisticReport as StatisticReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Helpers\StatisticGenerator;
 
 class AdminReportController extends Controller
 {
@@ -92,7 +92,7 @@ class AdminReportController extends Controller
                 $result[$key] = $this->statisticFormSkeleton[$key];
             }
         }
-        StatisticReport::dispatch(Auth::id(), $result)
+        StatisticReport::dispatch(Auth::id(), $result, new StatisticGenerator)
             ->onQueue('reports')
             ->delay(now()->addSeconds(20));
         return redirect('/admin/report');

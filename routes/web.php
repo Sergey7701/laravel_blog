@@ -13,13 +13,6 @@ use Illuminate\Support\Facades\Route;
   |
  */
 
-Route::get('/test', function() {
-//    Artisan::call('optimize:clear');
-    event(new \App\Events\ArticleCreated(App\Models\Article::find(2)));
-//  event(new \App\Events\SomethingHappens('lalala'));
-//    event(new \App\Events\Nothing);
-    //App\Jobs\StatisticReport::dispatch()->onQueue('report')->delay(now()->addMinutes(1));
-});
 Route::get('/service', 'PushServiceController@form');
 Route::post('/service', 'PushServiceController@send');
 Auth::routes();

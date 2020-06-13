@@ -11,6 +11,16 @@ use App\User;
 class StatisticGenerator
 {
 
+    public function __construct()
+    {
+        session(['use scopePublish' => true]);
+    }
+
+    public function __destruct()
+    {
+        session()->forget('use scopePublish');
+    }
+
     public function countPublishedEntries()
     {
         return Entry::count();
@@ -180,7 +190,6 @@ class StatisticGenerator
     private function mostCommentingEntry()
     {
         return Entry::withCount('comments')
-                ->wherePublish(1)
                 ->orderByDesc('comments_count')
                 ->first();
     }

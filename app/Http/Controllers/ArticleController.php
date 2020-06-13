@@ -15,7 +15,7 @@ use function flash;
 class ArticleController extends Controller
 {
 
-    function __construct()
+    public function __construct()
     {
         $this->middleware('auth', [
             'except' => [

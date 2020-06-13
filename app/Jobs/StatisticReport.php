@@ -19,17 +19,20 @@ class StatisticReport implements ShouldQueue
         Queueable,
         SerializesModels;
 
-    public $userId;
+    protected $userId;
     protected $statistic;
+    protected $statisticGenerator;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(int $userId, array $statistic)
+    public function __construct(int $userId, array $statistic, $statisticGenerator)
     {
         $this->userId = $userId;
+        $this->statisticGenerator = $statisticGenerator;
+        //Вставляем текст в заготовку отчёта.
         \App::setLocale('ru');
         foreach ($statistic as $key => $val) {
             foreach ($val as $func => $unused) {
@@ -45,17 +48,15 @@ class StatisticReport implements ShouldQueue
      */
     public function handle()
     {
-        session(['use scopePublish' => true]);
         foreach ($this->statistic as $key => $val) {
             foreach ($val as $text => $func) {
-                if (method_exists(StatisticGenerator::class, $func)) {
-                    $this->statistic[$key][$text] = (new StatisticGenerator)->$func();
+                if (method_exists($this->statisticGenerator, $func)) {
+                    $this->statistic[$key][$text] = $this->statisticGenerator->$func();
                 } else {
                     $this->statistic[$key][$text] = '!!! Ошибка !!!';
                 }
             }
         }
-        session()->forget('use scopePublish');
         event(new StatisticReportCast($this->statistic, $this->userId));
         (User::whereId($this->userId)->first())->notify(new StatisticMail($this->statistic));
     }

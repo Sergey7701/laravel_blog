@@ -12,6 +12,16 @@ use DB;
 class StatisticController extends Controller
 {
 
+    public function __construct()
+    {
+        session(['use scopePublish' => true]);
+    }
+
+    public function __destruct()
+    {
+        session()->forget('use scopePublish');
+    }
+
     public function index()
     {
         return view('statistic', array_merge(
