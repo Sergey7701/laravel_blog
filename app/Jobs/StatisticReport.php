@@ -34,7 +34,7 @@ class StatisticReport implements ShouldQueue
     {
         $this->userId             = $userId;
         $this->statistic          = $statistic;
-        $this->statisticGenerator = new $statisticGenerator;
+        $this->statisticGenerator = $statisticGenerator;
     }
 
     /**
@@ -44,18 +44,17 @@ class StatisticReport implements ShouldQueue
      */
     public function handle()
     {
-        //Сессия в конструкторе StatisticGenerator тут не работает, поэтому включаем руками
-        session(['use scopePublish' => true]);
+        //Только так, иначе сессия в конструкторе StatisticGenerator не включится и фильтр на publish не сработает
+        $statisticGenerator = new $this->statisticGenerator;
         foreach ($this->statistic as $key => $val) {
             foreach ($val as $text => $func) {
-                if (method_exists($this->statisticGenerator, $func)) {
-                    $this->statistic[$key][$text] = $this->statisticGenerator->$func();
+                if (method_exists($statisticGenerator, $func)) {
+                    $this->statistic[$key][$text] = $statisticGenerator->$func();
                 } else {
                     $this->statistic[$key][$text] = '!!! Ошибка !!!';
                 }
             }
         }
-        session()->forget('use scopePublish');
         event(new StatisticReportCast($this->statistic, $this->userId));
         (User::whereId($this->userId)->first())->notify(new StatisticMail($this->statistic));
     }
