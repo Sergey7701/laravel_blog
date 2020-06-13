@@ -1,4 +1,8 @@
 @include ('layouts.header', ['title' => 'Статистика сайта'])
+<?php
+\App::setLocale('ru');
+
+?>
 <form method="POST" action="/admin/report" class="col-6">
     {{ csrf_field() }}
     <h3>Статистика сайта:</h3>
@@ -11,7 +15,7 @@
 
                 ?>
                 <label class="col-12">
-                    {{ $text }}
+                    {{ __('statisticReport.' . $text) }}
                     <input type="checkbox" name="{{ $inputName }}">
                 </label>
                 <?php
@@ -19,7 +23,7 @@
 
                 ?>
                 <p class="col-12 mr-1">
-                    {{ $text }}
+                    {{ __('statisticReport.' . $text) }}
                 </p><?php
             }
         }

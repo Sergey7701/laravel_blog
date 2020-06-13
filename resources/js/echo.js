@@ -1,5 +1,4 @@
 /* Перезапускай сервер, если что!!! */
-let channelName = 'lalala';
 import FloatNotifyComponent from './components/FloatNotifyComponent.vue';
 Vue.component('float-notify-component', FloatNotifyComponent);
 if ($('#app').length) {

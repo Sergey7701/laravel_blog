@@ -30,6 +30,6 @@ class StatisticReport implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('App.User.' . $this->user);
+        return new PrivateChannel('personal-channel-user-' . $this->user);
     }
 }

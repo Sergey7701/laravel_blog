@@ -15,6 +15,6 @@ use App\Broadcasting\ComeChannel;
 Broadcast::channel('editor-notify', function ($user) {
     return (bool) $user->hasPermission('manage-articles');
 });
-Broadcast::channel('App.User.{id}', function ($user, $id) {
+Broadcast::channel('personal-channel-user-{id}', function ($user, $id) {
     return (bool) $user->hasPermission('manage-articles') && $user->id == $id;
 });
