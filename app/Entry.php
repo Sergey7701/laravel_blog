@@ -18,7 +18,7 @@ class Entry extends Model
     protected static function boot()
     {
         parent::boot();
-        if (session('use scopePublish')) {
+        if (config('custom.use_globalScopePublish')) {
             static::addGlobalScope('publish', function (Builder $builder) {
                 $builder->wherePublish(1);
             });

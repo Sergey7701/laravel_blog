@@ -14,12 +14,12 @@ class StatisticController extends Controller
 
     public function __construct()
     {
-        session(['use scopePublish' => true]);
+        config(['custom.use_globalScopePublish' => true]);
     }
 
     public function __destruct()
     {
-        session()->forget('use scopePublish');
+        config(['custom.use_globalScopePublish' => false]);
     }
 
     public function index()
