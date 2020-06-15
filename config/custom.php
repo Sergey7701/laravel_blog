@@ -1,4 +1,4 @@
 <?php
- return [
-     'use_globalScopePublish' => false,
- ];
+return [
+    'use_globalScopePublish' => false,
+];
