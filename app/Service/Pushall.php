@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Http;
 
 class Pushall
 {
-
+//* Аккаунт может протухнуть, не забываем поддерживать актуальные данные в .env
     private $apiKey;
     private $id;
     protected $url = 'https://pushall.ru/api.php';
@@ -25,6 +25,7 @@ class Pushall
             "title" => $title,
             "text"  => $text,
         ];
+             //   dd($data);
         Http::get($this->url, $data);
     }
 }

@@ -12,6 +12,16 @@ use DB;
 class StatisticController extends Controller
 {
 
+    public function __construct()
+    {
+        config(['custom.use_globalScopePublish' => true]);
+    }
+
+    public function __destruct()
+    {
+        config(['custom.use_globalScopePublish' => false]);
+    }
+
     public function index()
     {
         return view('statistic', array_merge(

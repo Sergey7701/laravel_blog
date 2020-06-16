@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Auth;
 class News extends Article
 {
 
-    protected $table    = 'news';
-    protected $fillable = [
+    protected $table            = 'news';
+    protected $fillable         = [
         'header',
         'text',
         'publish',
@@ -16,12 +16,13 @@ class News extends Article
         'newTags',
         'oldTags',
     ];
+    protected static $urlPrefix = 'news';
 
     public function versions()
     {
         return $this->hasMany(VersionNews::class);
     }
-
+ 
     protected static function makeVersion($news)
     {
         $newTags = $news->newTags;
@@ -35,6 +36,7 @@ class News extends Article
                 'publish'   => $news->publish,
                 'tags'      => $newTags,
                 'old_tags'  => $oldTags,
+                'prefix'    => 'news',
         ]);
     }
 }

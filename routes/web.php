@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
   | contains the "web" middleware group. Now create something great!
   |
  */
+
 Route::get('/service', 'PushServiceController@form');
 Route::post('/service', 'PushServiceController@send');
 Auth::routes();
@@ -42,6 +43,8 @@ Route::group(['middleware' => 'permission:manage-articles'], function() {
         return redirect('/admin/posts');
     });
     Route::resource('/admin/news', 'AdminNewsController');
+    Route::get('/admin/report', 'AdminReportController@showForm');
+    Route::post('/admin/report', 'AdminReportController@makeReport');
 });
 
 

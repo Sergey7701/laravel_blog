@@ -3,6 +3,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Route;
 
 class Entry extends Model
 {
@@ -17,9 +18,11 @@ class Entry extends Model
     protected static function boot()
     {
         parent::boot();
-        static::addGlobalScope('publish', function (Builder $builder) {
-            $builder->wherePublish(1);
-        });
+        if (config('custom.use_globalScopePublish')) {
+            static::addGlobalScope('publish', function (Builder $builder) {
+                $builder->wherePublish(1);
+            });
+        }
     }
 
     public function entryable()
