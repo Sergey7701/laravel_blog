@@ -12,15 +12,17 @@ class StatisticReport extends Notification
     use Queueable;
 
     protected $statistic;
+    protected $csvAttach;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($statistic)
+    public function __construct($statistic, $csvAttach)
     {
         $this->statistic = $statistic;
+        $this->csvAttach = $csvAttach;
     }
 
     /**
@@ -43,13 +45,16 @@ class StatisticReport extends Notification
     public function toMail($notifiable)
     {
         $mail = (new MailMessage)
-            ->greeting('Запрошена статистика по сайту ' . env('app.name'));
+            ->greeting('Запрошена статистика по сайту ' . env('app.name'));           
         foreach ($this->statistic as $key => $value) {
             foreach ($value as $text => $result) {
                 $mail->line($text . $result);
             }
             $mail->line('____________________________________________________');
         }
+         $mail->attachData($this->csvAttach, 'statistic.csv', [
+                'mime' => 'text/csv',
+            ]);
         return $mail;
     }
 
