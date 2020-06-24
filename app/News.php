@@ -8,6 +8,8 @@ class News extends Article
 {
 
     protected $table            = 'news';
+    protected $cacheTags        = ['news'];
+    protected $cachePrefix      = 'news_';
     protected $fillable         = [
         'header',
         'text',
@@ -20,9 +22,11 @@ class News extends Article
 
     public function versions()
     {
-        return $this->hasMany(VersionNews::class);
+        return $this->hasMany(VersionNews::class)
+                ->cachePrefix('version_' . $this->getUrlPrefix() . '-for-' . static::class . '-' . $this->id . '_')
+                ->cacheTags(['version_' . $this->getUrlPrefix() . '-for-' . static::class . '-' . $this->id . '_']);
     }
- 
+
     protected static function makeVersion($news)
     {
         $newTags = $news->newTags;

@@ -3,13 +3,27 @@ namespace App;
 
 use App\Models\Article;
 use Illuminate\Database\Eloquent\Model;
+use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class Tag extends Model
 {
 
-    protected $fillable = [
+    use QueryCacheable;
+
+    protected $cacheFor                  = 60 * 60 * 24 * 30;
+    protected static $flushCacheOnUpdate = true;
+    protected $cacheTags                 = ['tag']; //
+    protected $cachePrefix               = 'tag_';
+    protected $fillable                  = [
         'name',
     ];
+
+    protected function getCacheBaseTags(): array
+    {
+        return [
+            $this->cacheTags[0],
+        ];
+    }
 
     protected static function boot()
     {
@@ -44,5 +58,16 @@ class Tag extends Model
                             $query->wherePublish(1);
                         });
                     })->get()));
+    }
+
+    public function getCacheTagsToInvalidateOnUpdate(): array
+    {
+        return [
+            'entry',
+            'article',
+            'news',
+            'version',
+            'version-news',
+        ];
     }
 }

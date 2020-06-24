@@ -3,8 +3,8 @@ namespace App\Models;
 
 use App\Entry;
 use App\Events\ArticleCreated;
-use App\Events\ArticleUpdated;
 use App\Tag;
+use App\Traits\FlushCacheIfNeeded;
 use App\Version;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,7 +15,10 @@ class Article extends Entry
 
     use Sluggable;
     use SoftDeletes;
+    use FlushCacheIfNeeded;
 
+    protected $cacheTags        = ['article'];
+    protected $cachePrefix      = 'article_';
     protected $dates            = ['deleted_at'];
     protected $fillable         = [
         'header',
@@ -44,6 +47,7 @@ class Article extends Entry
             event(new ArticleCreated($article));
         });
         static::updating(function($article) {
+            $article->flushCacheIfTagsChanged($article, $article->oldTags, $article->newTags);
             get_class($article)::makeVersion($article);
         });
         static::updated(function($entryable) {
@@ -87,12 +91,16 @@ class Article extends Entry
 
     public function tags()
     {
-        return $this->morphToMany(Tag::class, 'taggable');
+        return $this->morphToMany(Tag::class, 'taggable')
+                ->cachePrefix('tags-for-' . static::class . '-' . $this->id . '_')
+                ->cacheTags(['tags-for-' . static::class . '-' . $this->id . '_']);
     }
 
     public function versions()
     {
-        return $this->hasMany(Version::class);
+        return $this->hasMany(Version::class)
+                ->cachePrefix('version_' . $this->getUrlPrefix() . '-for-' . static::class . '-' . $this->id . '_')
+                ->cacheTags(['version_' . $this->getUrlPrefix() . '-for-' . static::class . '-' . $this->id . '_']);
     }
 
     public function entry()

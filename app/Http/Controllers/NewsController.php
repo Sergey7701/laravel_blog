@@ -1,14 +1,18 @@
 <?php
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Events\ArticleCreated;
+use App\Mail\ArticleModified;
 use App\News;
-use Illuminate\Support\Facades\Auth;
 use App\Tag;
+use App\Traits\FlushCacheIfNeeded;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use function flash;
 
 class NewsController extends Controller
 {
-
+ use FlushCacheIfNeeded; 
     function __construct()
     {
         $this->middleware('permission:manage-articles', [
@@ -41,7 +45,7 @@ class NewsController extends Controller
         $news = News::create(array_merge($data, [
                 'author_id' => Auth::id(),
         ]));
-        event(new \App\Events\ArticleCreated($news));
+        event(new ArticleCreated($news));
         flash('Новость успешно создана');
         return redirect('/');
     }
@@ -117,7 +121,7 @@ class NewsController extends Controller
             'newTags' => $request->tags,
             'oldTags' => $oldTags,
         ]));
-        \Mail::to($news->author->email)->send(new \App\Mail\ArticleModified($news));
+        \Mail::to($news->author->email)->send(new ArticleModified($news));
         flash('Новость успешно изменена');
         return $news;
     }

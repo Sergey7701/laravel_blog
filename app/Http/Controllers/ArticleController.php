@@ -2,7 +2,6 @@
 namespace App\Http\Controllers;
 
 use App\Entry;
-use App\Events\ArticleCreated;
 use App\Mail\ArticleDeleted;
 use App\Mail\ArticleModified;
 use App\Models\Article as ArticleModel;
