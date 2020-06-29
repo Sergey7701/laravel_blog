@@ -44,6 +44,7 @@ class User extends Authenticatable
 
     protected static function boot()
     {
+        parent::boot();
         static::creating(function() {
             Cache::tags(['statistic'])->forever('PleaseClearCache!', true);
         });
