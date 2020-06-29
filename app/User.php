@@ -42,6 +42,19 @@ class User extends Authenticatable
     protected $rolesTable       = 'role_user';
     protected $permissionsTable = 'users_permissions';
 
+    protected static function boot()
+    {
+        static::creating(function() {
+            Cache::tags(['statistic'])->forever('PleaseClearCache!', true);
+        });
+        static::updating(function() {
+            Cache::tags(['statistic'])->forever('PleaseClearCache!', true);
+        });
+        static::deleting(function() {
+            Cache::tags(['statistic'])->forever('PleaseClearCache!', true);
+        });
+    }
+
     public function articles()
     {
         return $this->hasMany(Article::class, 'author_id');

@@ -45,4 +45,10 @@ class Entry extends Model
     {
         return $this->belongsTo(User::class);
     }
+     protected function getCacheBaseTags(): array
+    {
+        return [
+            'entry_tag',
+        ];
+    }
 }

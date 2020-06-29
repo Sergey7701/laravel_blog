@@ -43,4 +43,10 @@ class News extends Article
                 'prefix'    => 'news',
         ]);
     }
+     protected function getCacheBaseTags(): array
+    {
+        return [
+            'news_tag',
+        ];
+    }
 }
