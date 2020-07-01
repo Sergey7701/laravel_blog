@@ -6,6 +6,8 @@ use App\News;
 class VersionNews extends Version
 {
 
+    protected $cacheTags        = ['version-news']; //
+    protected $cachePrefix      = 'version-news_';
     protected $fillable         = [
         'news_id',
         'editor_id',
@@ -20,6 +22,10 @@ class VersionNews extends Version
     public function news()
     {
         return $this->belongsTo(News::class);
+    }
+    public function entry()
+    {
+        return $this->news();
     }
 
     public function scopeRecentArticle()

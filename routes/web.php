@@ -46,5 +46,3 @@ Route::group(['middleware' => 'permission:manage-articles'], function() {
     Route::get('/admin/report', 'AdminReportController@showForm');
     Route::post('/admin/report', 'AdminReportController@makeReport');
 });
-
-

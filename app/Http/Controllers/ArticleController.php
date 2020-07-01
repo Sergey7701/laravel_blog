@@ -2,7 +2,6 @@
 namespace App\Http\Controllers;
 
 use App\Entry;
-use App\Events\ArticleCreated;
 use App\Mail\ArticleDeleted;
 use App\Mail\ArticleModified;
 use App\Models\Article as ArticleModel;
@@ -31,6 +30,7 @@ class ArticleController extends Controller
     public function index()
     {
         session(['admin' => false]);
+        
         return view('welcome', [
             'entries' => Entry::with('entryable')
                 ->where('publish', true)
@@ -66,7 +66,7 @@ class ArticleController extends Controller
             'text'        => 'required',
             'publish'     => 'in:on'
         ]);
-        $article = ArticleModel::create(array_merge($data, [
+        ArticleModel::create(array_merge($data, [
                 //'publish'   => isset($data['publish']) ? 1 : null,
                 'author_id' => Auth::id(),
         ]));
@@ -115,8 +115,8 @@ class ArticleController extends Controller
     {
         abort_if(Auth()->user()->cannot('update', $article), 403);
         abort_if(!$article->id, 404);
-        $article = $this->updateFunction($request, $article);
-        return redirect("/posts/$article->slug");
+        $articleUpdate = $this->updateFunction($request, $article);
+        return redirect("/posts/$articleUpdate->slug");
     }
 
     /**

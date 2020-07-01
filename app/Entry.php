@@ -3,12 +3,18 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Route;
+use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class Entry extends Model
 {
 
-    protected $fillable = [
+    use QueryCacheable;
+
+    protected $cacheFor                  = 60 * 60;
+    protected static $flushCacheOnUpdate = true;
+    protected $cacheTags                 = ['entry']; //
+    protected $cachePrefix               = 'entry_';
+    protected $fillable                  = [
         'entryable_id',
         'entryable_type',
         'publish',
@@ -38,5 +44,11 @@ class Entry extends Model
     public function author()
     {
         return $this->belongsTo(User::class);
+    }
+     protected function getCacheBaseTags(): array
+    {
+        return [
+            'entry_tag',
+        ];
     }
 }

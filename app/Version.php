@@ -5,11 +5,19 @@ use App\Models\Article;
 use Illuminate\Database\Eloquent\Model;
 use App\Events\ArticleUpdated;
 use \Cviebrock\EloquentSluggable\Services\SlugService;
+use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class Version extends Model
 {
 
-    protected $fillable = [
+    use QueryCacheable;
+    use Traits\FlushCacheIfNeeded;
+
+    protected $cacheFor                  = 60 * 60 * 24;
+    protected static $flushCacheOnUpdate = true;
+    protected $cacheTags                 = ['version']; //
+    protected $cachePrefix               = 'version_';
+    protected $fillable                  = [
         'article_id',
         'editor_id',
         'tags',
@@ -19,7 +27,8 @@ class Version extends Model
         'text',
         'publish',
     ];
-    protected static $baseModel = Article::class;
+    //Для получения настроек из модели
+    protected static $baseModel          = Article::class;
 
     protected static function boot()
     {
@@ -35,6 +44,11 @@ class Version extends Model
     public function article()
     {
         return $this->belongsTo(Article::class);
+    }
+
+    public function entry()
+    {
+        return $this->article();
     }
 
     public function editor()

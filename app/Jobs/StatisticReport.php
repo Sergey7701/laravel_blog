@@ -53,6 +53,29 @@ class StatisticReport implements ShouldQueue
             }
         }
         event(new StatisticReportCast($this->statistic, $this->userId));
-        (User::whereId($this->userId)->first())->notify(new StatisticMail($this->statistic));
+        (User::whereId($this->userId)->first())->notify(new StatisticMail($this->statistic, $this->makeCsv($this->statistic)));
+    }
+
+    private function makeCsv($result, $d = ",", $q = '"')
+    {
+        $line = "";
+        foreach ($result as $list) {
+            foreach ($list as $text => $func) {
+                # remove any windows new lines,
+                # as they interfere with the parsing at the other end
+                $temp1  = str_replace("\r\n", "\n", $text);
+                # if a deliminator char, a double quote char or a newline
+                # are in the field, add quotes
+                $field1 = (preg_match("/[$d$q\n\r]/", $temp1)) ?
+                    $q . str_replace($q, $q . $q, $field1) . $q : $temp1;
+                $temp2  = str_replace("\r\n", "\n", $func);
+                $field2 = (preg_match("/[$d$q\n\r]/", $temp2)) ?
+                    $q . str_replace($q, $q . $q, $field1) . $q : $temp2;
+                $line   .= $field1 . $d . $field2 . "\r\n";
+            }
+        }
+        # strip the last deliminator
+        return substr($line, 0, -1);
+        ;
     }
 }
